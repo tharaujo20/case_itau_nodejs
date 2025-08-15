@@ -1,6 +1,6 @@
 export abstract class ClientManagerService {
   abstract findOne(clientID: string): Promise<any>;
-  abstract findAll(): Promise<[any]>;
+  abstract findAll(): Promise<any[]>;
 }
 
 //camada de abstração
