@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../../application/services/database.service';
 import sqlite3 from 'sqlite3';
+import { Client } from '../../domain/client.model';
 
 @Injectable()
 export class ClientDatabase implements DatabaseService {
@@ -10,7 +11,7 @@ export class ClientDatabase implements DatabaseService {
 
   constructor(private readonly configService: ConfigService) {
     this.db = new sqlite3.Database(':memory:');
-    this.sql = this.configService.get('sql');
+    this.sql = this.configService.get<string>('sql');
 
     this.db.serialize(() => {
       this.db.run(this.sql.createTableClientes);
@@ -54,20 +55,26 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async create(name: string, email: string): Promise<void> {
+  public async create(client: Client): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.db.run(this.sql.insertClient, [name, email, 0], function (error) {
-        if (error) {
-          Logger.error(
-            '[ClientDatabase][create] Error while creating new client',
-            error
-          );
-          return reject(error);
-        }
+      this.db.run(
+        this.sql.insertClient,
+        [client.id, client.name, client.email, client.saldo],
+        function (error) {
+          if (error) {
+            Logger.error(
+              '[ClientDatabase][create] Error while creating new client',
+              error
+            );
+            return reject(error);
+          }
 
-        Logger.log('[ClientDatabase][create] Client created successfully');
-        resolve();
-      });
+          Logger.log(
+            `[ClientDatabase][create] Client ${client.id} created successfully`
+          );
+          resolve();
+        }
+      );
     });
   }
 
@@ -153,3 +160,11 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 }
+
+//Usa configService disponibilizado no nest.js, para consumir configurações das variáveis de ambeinte
+//Evita configuração hardcoded
+//Serve a abstração do database service, encapsulamento
+//Responsabilidade única de atender ao Service de Database (solid)
+//Trata comportamentos e exceções individulamente, try/catch em cada método, facilitar debugging e análise de logs em caso de erro
+//Chama serviço responsável pela camada de comunicação com banco de dados
+//abordagem diferente pois o sqlite não suporta a forma do axios

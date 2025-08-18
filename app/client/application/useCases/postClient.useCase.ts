@@ -4,27 +4,32 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ClientManagerService } from '../services/clientManager.service';
-import { ClientResponseDto } from '../../domain/client.model';
+import { CreateClientDto, ClientResponseDto } from '../../domain/client.model';
+import { randomUUID } from 'crypto';
 
 @Injectable()
-export class GetClientUseCase {
+export class PostClientUseCase {
   constructor(private readonly clientService: ClientManagerService) {}
 
-  public async execute(
-    clientId?: string
-  ): Promise<ClientResponseDto | ClientResponseDto[]> {
+  public async execute(newClient: CreateClientDto): Promise<void> {
     try {
-      Logger.debug('[GetClientUseCase][execute] Starting...');
+      Logger.debug('[PostClientUseCase][execute] Starting...');
 
-      const result = clientId
-        ? await this.clientService.findOne(clientId)
-        : await this.clientService.findAll();
+      const client: ClientResponseDto = {
+        id: randomUUID(),
+        name: newClient.name,
+        email: newClient.email,
+        saldo: 0, // saldo inicial sempre 0
+      };
 
-      Logger.log('[GetClientUseCase][execute] Success', result);
-      return result;
+      await this.clientService.addClient(client);
+
+      Logger.log(
+        `[PostClientUseCase][execute] Success: client ${client.id} created`
+      );
     } catch (error) {
       Logger.error(
-        '[GetClientUseCase][execute] Error while getting client:',
+        '[PostClientUseCase][execute] Error while posting client:',
         error
       );
       throw new InternalServerErrorException(error);
@@ -40,8 +45,8 @@ export class GetClientUseCase {
 // Este caso de uso consome do serviço de clientes
 // Caso de uso encapsula a camada de negócio prevista na arquitetura hexagonal
 // Abstrai da implementação da camada de aplicação
-// Reuso: Qualquer regra de negócio que precise BUSCAR relacionado ao cliente, se serve deste caso de uso
+// Reuso: Qualquer regra de negócio que precise CRIAR algo relacionado ao cliente, se serve deste caso de uso
 // Resiliência: bloco try/catch na camada de caso de uso para tratativa do comportamento da regra
-// Caso de uso de busca, as trataivas de negócio são aplicadas nessa camada (ex. se um ou todos os clientes)
+// Caso de uso de criação, as trataivas de negócio são aplicadas nessa camada
 
 //Framework nest, arquitura hexagonal, princípios CleanCode, otimização de custos

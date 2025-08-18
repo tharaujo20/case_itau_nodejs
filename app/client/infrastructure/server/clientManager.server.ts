@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ClientManagerService } from '../../application/services/clientManager.service';
 import { DatabaseService } from 'client/application/services/database.service';
+import { Client } from '../../domain/client.model';
 
 @Injectable()
 export class ClientManagerServer implements ClientManagerService {
@@ -41,8 +42,28 @@ export class ClientManagerServer implements ClientManagerService {
       );
     }
   }
+
+  public async addClient(client: Client): Promise<void> {
+    try {
+      Logger.debug('[ClientManagerServer][addClient] Calling method...');
+      const response: any = await this.databaseService.create(client);
+
+      Logger.log('[ClientManagerServer][addClient] response:', response);
+      return response;
+    } catch (error) {
+      Logger.error(
+        `[ClientManagerServer][addClient] Error while creating the client ${client.id}: `,
+        error
+      );
+      throw new Error(
+        `[ClientManagerServer][addClient] Error while creating the client ${client.id}: ${error}`
+      );
+    }
+  }
 }
 
-//import {ConfigService} from '@nestjs/config'
-//constructor(private readonly config ConfigSErvice){}
-// ... url: `https://${this.configService.get<string>('var env file')}`
+//Serve a abstração do client service, encapsulamento
+//Responsabilidade única de atender ao Service de Clientes (solid)
+//Separação da camada que conversa com o banco de dados
+//Trata comportamentos e exceções individulamente, try/catch em cada método, facilitar debugging e análise de logs em caso de erro
+//Chama serviço responsável pela camada de comunicação com banco de dados
