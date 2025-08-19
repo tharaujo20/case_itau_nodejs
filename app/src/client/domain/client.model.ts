@@ -1,13 +1,14 @@
 import {
-  IsUUID,
   IsEmail,
   IsNotEmpty,
-  IsString,
   IsOptional,
+  IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class GetClientByIdDto {
   @IsUUID()
+  @IsNotEmpty()
   id: string;
 }
 
@@ -17,11 +18,13 @@ export class CreateClientDto {
   name: string;
 
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 }
 
 export class UpdateClientDto {
   @IsUUID()
+  @IsNotEmpty()
   id: string;
 
   @IsString()
@@ -33,7 +36,13 @@ export class UpdateClientDto {
   email?: string;
 }
 
-export class ClientResponseDto {
+export class DeleteClientDto {
+  @IsUUID()
+  @IsNotEmpty()
+  id: string;
+}
+
+export class ClientCompleteDto {
   id: string;
   name: string;
   email: string;

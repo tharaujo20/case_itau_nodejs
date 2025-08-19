@@ -3,33 +3,28 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { ClientCompleteDto, GetClientByIdDto } from '../../domain/client.model';
 import { ClientManagerService } from '../services/clientManager.service';
-import { CreateClientDto, ClientResponseDto } from '../../domain/client.model';
-import { randomUUID } from 'crypto';
 
 @Injectable()
-export class PostClientUseCase {
+export class GetClientUseCase {
   constructor(private readonly clientService: ClientManagerService) {}
 
-  public async execute(newClient: CreateClientDto): Promise<void> {
+  public async execute(
+    clientId?: GetClientByIdDto
+  ): Promise<ClientCompleteDto | ClientCompleteDto[]> {
     try {
-      Logger.debug('[PostClientUseCase][execute] Starting...');
+      Logger.debug('[GetClientUseCase][execute] Starting...');
 
-      const client: ClientResponseDto = {
-        id: randomUUID(),
-        name: newClient.name,
-        email: newClient.email,
-        saldo: 0, // saldo inicial sempre 0
-      };
+      const result = clientId
+        ? await this.clientService.findOne(clientId)
+        : await this.clientService.findAll();
 
-      await this.clientService.addClient(client);
-
-      Logger.log(
-        `[PostClientUseCase][execute] Success: client ${client.id} created`
-      );
+      Logger.log('[GetClientUseCase][execute] Success', result);
+      return result;
     } catch (error) {
       Logger.error(
-        '[PostClientUseCase][execute] Error while posting client:',
+        '[GetClientUseCase][execute] Error while getting client:',
         error
       );
       throw new InternalServerErrorException(error);
@@ -37,6 +32,7 @@ export class PostClientUseCase {
   }
 }
 
+//NOTAS DESTE ARQUIVO
 // Decorator Injectable, para que o nest considere esse serviço ao gerenciar a injeção de dependências
 // Logger nativo do nest, integra com módulos e bibliotecas, pode ser instrumentalizado para 'alimentar' datadog //TODO VER ISSO AQUI como funciona
 // Padrão [NomeDaClasse][NomeDoMetodo] padrão de geração de log para melhor identificação ao debuggar e analisar logs, facilita manutenção
@@ -45,8 +41,8 @@ export class PostClientUseCase {
 // Este caso de uso consome do serviço de clientes
 // Caso de uso encapsula a camada de negócio prevista na arquitetura hexagonal
 // Abstrai da implementação da camada de aplicação
-// Reuso: Qualquer regra de negócio que precise CRIAR algo relacionado ao cliente, se serve deste caso de uso
+// Reuso: Qualquer regra de negócio que precise BUSCAR relacionado ao cliente, se serve deste caso de uso
 // Resiliência: bloco try/catch na camada de caso de uso para tratativa do comportamento da regra
-// Caso de uso de criação, as trataivas de negócio são aplicadas nessa camada
+// Caso de uso de busca, as trataivas de negócio são aplicadas nessa camada (ex. se um ou todos os clientes)
 
 //Framework nest, arquitura hexagonal, princípios CleanCode, otimização de custos

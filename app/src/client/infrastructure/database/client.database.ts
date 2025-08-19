@@ -1,8 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DatabaseService } from '../../application/services/database.service';
 import sqlite3 from 'sqlite3';
-import { Client } from '../../domain/client.model';
+import { TransactionDto } from 'src/client/domain/account.model';
+import { DatabaseService } from '../../application/services/database.service';
+import {
+  ClientCompleteDto,
+  DeleteClientDto,
+  GetClientByIdDto,
+  UpdateClientDto,
+} from '../../domain/client.model';
 
 @Injectable()
 export class ClientDatabase implements DatabaseService {
@@ -19,7 +25,7 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async getAll(): Promise<any[]> {
+  public async getAll(): Promise<ClientCompleteDto[]> {
     return new Promise((resolve, reject) => {
       this.db.all(this.sql.selectAllClients, [], (error, all) => {
         if (error) {
@@ -31,12 +37,12 @@ export class ClientDatabase implements DatabaseService {
         }
 
         Logger.log('[ClientDatabase][getAll] Clients retrieved sucessfully');
-        resolve(all);
+        resolve(all as ClientCompleteDto[]);
       });
     });
   }
 
-  public async getOne(clientId: string): Promise<any> {
+  public async getOne(clientId: GetClientByIdDto): Promise<ClientCompleteDto> {
     return new Promise((resolve, reject) => {
       this.db.get(this.sql.selectClientById, [clientId], (error, item) => {
         if (error) {
@@ -50,12 +56,33 @@ export class ClientDatabase implements DatabaseService {
         Logger.log(
           `[ClientDatabase][getOne] Client ${clientId} retrieved sucessfully`
         );
-        resolve(item);
+
+        resolve(item as ClientCompleteDto);
       });
     });
   }
 
-  public async create(client: Client): Promise<void> {
+  public async getByEmail(email: string): Promise<ClientCompleteDto | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(this.sql.selectByEmail, [email], (error, item) => {
+        if (error) {
+          Logger.error(
+            `[ClientDatabase][getOne] Error while getting the client by email ${email}`,
+            error
+          );
+          return reject(error);
+        }
+
+        Logger.log(
+          `[ClientDatabase][getOne] Client with email ${email} retrieved sucessfully`
+        );
+
+        resolve(item as ClientCompleteDto);
+      });
+    });
+  }
+
+  public async create(client: ClientCompleteDto): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
         this.sql.insertClient,
@@ -78,26 +105,22 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async update(
-    clientId: string,
-    name: string,
-    email: string
-  ): Promise<void> {
+  public async update(updateClient: UpdateClientDto): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
         this.sql.updateClient,
-        [name, email, clientId],
+        [updateClient.name, updateClient.email, updateClient.id],
         function (error) {
           if (error) {
             Logger.error(
-              `[ClientDatabase][update] Error while updating the client ${clientId}`,
+              `[ClientDatabase][update] Error while updating the client ${updateClient.id}`,
               error
             );
             return reject(error);
           }
 
           Logger.log(
-            `[ClientDatabase][update] Client ${clientId} updated successfully`
+            `[ClientDatabase][update] Client ${updateClient.id} updated successfully`
           );
           resolve();
         }
@@ -105,26 +128,29 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async delete(clientId: string): Promise<void> {
+  public async delete(client: DeleteClientDto): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.db.run(this.sql.deleteClient, [clientId], function (error) {
+      this.db.run(this.sql.deleteClient, [client.id], function (error) {
         if (error) {
           Logger.error(
-            `[ClientDatabase][delete] Error while deleting the client ${clientId}`,
+            `[ClientDatabase][delete] Error while deleting the client ${client.id}`,
             error
           );
           return reject(error);
         }
 
         Logger.log(
-          `[ClientDatabase][delete] Client ${clientId} deleted successfully`
+          `[ClientDatabase][delete] Client ${client.id} deleted successfully`
         );
         resolve();
       });
     });
   }
 
-  public async deposit(clientId: string, value: number): Promise<void> {
+  public async deposit(
+    clientId: GetClientByIdDto,
+    value: TransactionDto
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(this.sql.deposit, [value, clientId], function (error) {
         if (error) {
@@ -141,7 +167,10 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async withdraw(clientId: string, value: number): Promise<void> {
+  public async withdraw(
+    clientId: GetClientByIdDto,
+    value: TransactionDto
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(this.sql.withdraw, [value, clientId], function (error) {
         if (error) {
