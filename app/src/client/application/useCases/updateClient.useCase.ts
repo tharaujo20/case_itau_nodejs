@@ -15,16 +15,13 @@ import { ClientManagerService } from '../services/clientManager.service';
 export class UpdateClientUseCase {
   constructor(private readonly clientService: ClientManagerService) {}
 
-  public async execute(
-    id: GetClientByIdDto,
-    client: UpdateClientDto
-  ): Promise<void> {
+  public async execute(client: UpdateClientDto): Promise<void> {
     try {
       Logger.debug(
-        `[UpdateClientUseCase][execute] Starting update for clientId: ${id}`
+        `[UpdateClientUseCase][execute] Starting update for clientId: ${client.id}`
       );
 
-      const existingClient = await this.checkIfClientExists(id);
+      const existingClient = await this.checkIfClientExists(client.id);
 
       const updatedClient = {
         ...existingClient,
@@ -35,24 +32,24 @@ export class UpdateClientUseCase {
       await this.clientService.updateClient(updatedClient);
 
       Logger.log(
-        `[UpdateClientUseCase][execute] Success: client ${id} updated`
+        `[UpdateClientUseCase][execute] Success: client ${client.id} updated`
       );
     } catch (error) {
       Logger.error(
-        `[UpdateClientUseCase][execute] Error updating client ${id}: `,
+        `[UpdateClientUseCase][execute] Error updating client ${client.id}: `,
         error
       );
       throw new InternalServerErrorException(error);
     }
   }
 
-  private async checkIfClientExists(
-    id: GetClientByIdDto
-  ): Promise<ClientCompleteDto> {
+  private async checkIfClientExists(id: string): Promise<ClientCompleteDto> {
     Logger.debug(
       '[UpdateClientUseCase][checkIfClientExists] Starting to check if the client exists...'
     );
-    const existingClient = await this.clientService.findOne(id);
+    const existingClient = await this.clientService.findOne(
+      id as unknown as GetClientByIdDto
+    );
 
     if (!existingClient) {
       throw new BadRequestException(`Client with id ${id} not found`);

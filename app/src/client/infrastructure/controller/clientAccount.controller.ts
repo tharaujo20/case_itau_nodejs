@@ -61,14 +61,11 @@ export class ClientAccountController {
   }
 
   @Put(':id')
-  async updateClient(
-    @Param('id') id: GetClientByIdDto,
-    @Body() client: UpdateClientDto
-  ): Promise<void> {
+  async updateClient(@Body() client: UpdateClientDto): Promise<void> {
     Logger.debug(
       '[ClientAccountController][updateClient] Calling the use case...'
     );
-    await this.updateClientUseCase.execute(id, client);
+    await this.updateClientUseCase.execute(client);
   }
 
   @Delete(':id')

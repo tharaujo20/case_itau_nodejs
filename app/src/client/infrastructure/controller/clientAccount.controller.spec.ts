@@ -1,97 +1,210 @@
-// import { Logger } from '@nestjs/common';
-// import { Test, TestingModule } from '@nestjs/testing';
+import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Chance } from 'chance';
+import { DeleteClientUseCase } from '../../application/useCases/deleteClient.useCase';
+import { DepositValueUseCase } from '../../application/useCases/depositValue.useCase';
+import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
+import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
+import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
+import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
+import { ClientAccountController } from '../controller/clientAccount.controller';
+import {
+  ClientCompleteDto,
+  CreateClientDto,
+  DeleteClientDto,
+  GetClientByIdDto,
+  UpdateClientDto,
+} from 'src/client/domain/client.model';
+import { TransactionDto } from 'src/client/domain/account.model';
 
-// import { ImageManagerClient } from 'src/adapters/client/imageManager.client';
-// import { StorageManagerClient } from 'src/adapters/client/storageManager.client';
-// import { ImageManagerService } from 'src/adapters/services/imageManager.service';
-// import { StorageManagerService } from 'src/adapters/services/storageManager.service';
-// import { DeleteClientUseCase } from '../../application/useCases/deleteClient.useCase';
-// import { DepositValueUseCase } from '../../application/useCases/depositValue.useCase';
-// import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
-// import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
-// import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
-// import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
-// import { AppControler } from '../imagesManager.controller';
-// import { ClientAccountController } from './clientAccount.controller';
-// import { ClientManagerService } from 'src/client/application/services/clientManager.service';
-// import { AccountManagerService } from 'src/client/application/services/accountManager.service';
-// import { DatabaseService } from 'src/client/application/services/database.service';
-// import { ClientManagerServer } from '../server/clientManager.server';
-// import { AccountManagerServer } from '../server/accountManager.server';
-// import { ClientDatabase } from '../database/client.database';
+describe('ClientAccountController', () => {
+  const chance = new Chance();
 
-// describe('ClientAccountController', () => {
-//   let clientAccountController: ClientAccountController;
-//   let getClientUseCase: GetClientUseCase;
-//   let postClientUseCase: PostClientUseCase;
-//   let updateClientUseCase: UpdateClientUseCase;
-//   let deleteClientUseCase: DeleteClientUseCase;
-//   let depositValueUseCase: DepositValueUseCase;
-//   let withdrawValueUseCase: WithdrawValueUseCase;
-//   let clientManagerService: ClientManagerService;
-//   let accountManagerService: AccountManagerService;
-//   let databaseService: DatabaseService;
+  let controller: ClientAccountController;
+  let getClientUseCase: GetClientUseCase;
+  let postClientUseCase: PostClientUseCase;
+  let updateClientUseCase: UpdateClientUseCase;
+  let deleteClientUseCase: DeleteClientUseCase;
+  let depositValueUseCase: DepositValueUseCase;
+  let withdrawValueUseCase: WithdrawValueUseCase;
 
-//   beforeEach(async () => {
-//     const app: TestingModule = await Test.createTestingModule({
-//       controllers: [ClientAccountController],
-//       providers: [
-//         Logger,
-//         { provide: ClientManagerService, useValue: ClientManagerServer },
-//         { provide: AccountManagerService, useValue: AccountManagerServer },
-//         { provide: DatabaseService, useValue: ClientDatabase },
-//       ],
-//     }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [ClientAccountController],
+      providers: [
+        { provide: GetClientUseCase, useValue: { execute: jest.fn() } },
+        { provide: PostClientUseCase, useValue: { execute: jest.fn() } },
+        { provide: UpdateClientUseCase, useValue: { execute: jest.fn() } },
+        { provide: DeleteClientUseCase, useValue: { execute: jest.fn() } },
+        { provide: DepositValueUseCase, useValue: { execute: jest.fn() } },
+        { provide: WithdrawValueUseCase, useValue: { execute: jest.fn() } },
+      ],
+    }).compile();
 
-//     clientAccountController = app.get<ClientAccountController>(
-//       ClientAccountController
-//     );
-//     clientManagerService = app.get<ClientManagerService>(ClientManagerService);
-//     accountManagerService = app.get<AccountManagerService>(
-//       AccountManagerService
-//     );
-//     databaseService = app.get<DatabaseService>(DatabaseService);
-//   });
+    controller = module.get<ClientAccountController>(ClientAccountController);
+    getClientUseCase = module.get<GetClientUseCase>(GetClientUseCase);
+    postClientUseCase = module.get<PostClientUseCase>(PostClientUseCase);
+    updateClientUseCase = module.get<UpdateClientUseCase>(UpdateClientUseCase);
+    deleteClientUseCase = module.get<DeleteClientUseCase>(DeleteClientUseCase);
+    depositValueUseCase = module.get<DepositValueUseCase>(DepositValueUseCase);
+    withdrawValueUseCase =
+      module.get<WithdrawValueUseCase>(WithdrawValueUseCase);
+  });
 
-//   it('should be defined', async () => {
-//     // //Arrange
-//     // const imageToBePosted = {
-//     //   title: 'tiger',
-//     //   description: 'this is a beautiful tiger',
-//     //   tags: ['cat', 'wild', 'tiger'],
-//     //   owner: 'owner',
-//     // };
-//     // const register = {
-//     //   id: 'string',
-//     //   name: imageToBePosted.title,
-//     //   description: imageToBePosted.description,
-//     //   type: 'string',
-//     //   size: 'string',
-//     //   imagePath: 'string',
-//     //   tags: imageToBePosted.tags,
-//     //   owner: imageToBePosted.owner,
-//     //   status: 'string',
-//     //   createdAt: 'string',
-//     //   updatedAt: 'string',
-//     // };
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//     // const expected = `Item ${register} added into storage succesfully`;
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+    expect(getClientUseCase).toBeDefined();
+    expect(postClientUseCase).toBeDefined();
+    expect(updateClientUseCase).toBeDefined();
+    expect(deleteClientUseCase).toBeDefined();
+    expect(depositValueUseCase).toBeDefined();
+    expect(withdrawValueUseCase).toBeDefined();
+  });
 
-//     // //Act
-//     // const result = await appControler.postImages(imageToBePosted);
+  it('should get all clients', async () => {
+    // Arrange
+    const result: ClientCompleteDto[] = [
+      {
+        id: chance.guid(),
+        name: chance.name(),
+        email: chance.email(),
+        saldo: chance.floating({ min: 1, max: 1000 }),
+      },
+      {
+        id: chance.guid(),
+        name: chance.name(),
+        email: chance.email(),
+        saldo: chance.floating({ min: 1, max: 1000 }),
+      },
+    ];
 
-//     //Assert
-//     expect(clientAccountController).toBeDefined();
-//     expect(clientManagerService).toBeDefined();
-//     expect(accountManagerService).toBeDefined();
-//     expect(databaseService).toBeDefined();
-//   });
+    jest.spyOn(getClientUseCase, 'execute').mockResolvedValue(result);
+    jest.spyOn(Logger, 'debug').mockImplementation();
 
-//   //   it('should get an image by id', () => {});
+    // Act
+    const response = await controller.getAllClients();
 
-//   //   it('should get all images', () => {});
+    // Assert
+    expect(getClientUseCase.execute).toHaveBeenCalled();
+    expect(Logger.debug).toHaveBeenCalled();
+    expect(response).toBe(result);
+  });
 
-//   //   it('should delete an image by id', () => {});
+  it('should get client by id', async () => {
+    // Arrange
+    const id = chance.guid();
+    const result: ClientCompleteDto = {
+      id: chance.guid(),
+      name: chance.name(),
+      email: chance.email(),
+      saldo: chance.floating({ min: 1, max: 1000 }),
+    };
 
-//   //   it('should delete all images', () => {});
-// });
+    jest.spyOn(getClientUseCase, 'execute').mockResolvedValue(result);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+
+    // Act
+    const response = await controller.getClientById(id);
+
+    // Assert
+    expect(getClientUseCase.execute).toHaveBeenCalledWith(id);
+    expect(Logger.debug).toHaveBeenCalled();
+    expect(response).toBe(result);
+  });
+
+  it('should post new client', async () => {
+    // Arrange
+    const client: CreateClientDto = {
+      name: chance.name(),
+      email: chance.email(),
+    };
+
+    jest.spyOn(postClientUseCase, 'execute').mockResolvedValue(undefined);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+
+    // Act
+    await controller.postNewClient(client);
+
+    // Assert
+    expect(postClientUseCase.execute).toHaveBeenCalledWith(client);
+    expect(Logger.debug).toHaveBeenCalled();
+  });
+
+  it('should update client', async () => {
+    //Arrange
+    const client: UpdateClientDto = {
+      id: chance.guid(),
+      name: chance.name(),
+      email: chance.email(),
+    };
+
+    jest.spyOn(updateClientUseCase, 'execute').mockResolvedValue(undefined);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+
+    //Act
+    await controller.updateClient(client);
+
+    // Assert
+    expect(updateClientUseCase.execute).toHaveBeenCalledWith(client);
+    expect(Logger.debug).toHaveBeenCalled();
+  });
+
+  it('should delete client', async () => {
+    // Arrange
+    const id: DeleteClientDto = { id: chance.guid() };
+
+    jest.spyOn(deleteClientUseCase, 'execute').mockResolvedValue(undefined);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+
+    // Act
+    await controller.deleteClient(id);
+
+    // Assert
+    expect(deleteClientUseCase.execute).toHaveBeenCalledWith(id);
+    expect(Logger.debug).toHaveBeenCalled();
+  });
+
+  it('should deposit money', async () => {
+    // Arrange
+    const id: GetClientByIdDto = chance.guid();
+    const amount: TransactionDto = {
+      amount: chance.floating({ min: 1, max: 1000 }),
+    };
+    const result: number = chance.floating({ min: 1, max: 1000 });
+
+    jest.spyOn(depositValueUseCase, 'execute').mockResolvedValue(result);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+
+    // Act
+    const response = await controller.depositMoney(id, amount);
+
+    // Assert
+    expect(depositValueUseCase.execute).toHaveBeenCalledWith(id, amount);
+    expect(response).toBe(result);
+    expect(Logger.debug).toHaveBeenCalled();
+  });
+
+  it('should withdraw money', async () => {
+    // Arrange
+    const id: GetClientByIdDto = chance.guid();
+    const amount: TransactionDto = {
+      amount: chance.floating({ min: 1, max: 1000 }),
+    };
+    const result: number = chance.floating({ min: 1, max: 1000 });
+
+    jest.spyOn(withdrawValueUseCase, 'execute').mockResolvedValue(result);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+
+    // Act
+    const response = await controller.withdrawMoney(id, amount);
+
+    // Assert
+    expect(withdrawValueUseCase.execute).toHaveBeenCalledWith(id, amount);
+    expect(response).toBe(result);
+    expect(Logger.debug).toHaveBeenCalled();
+  });
+});
