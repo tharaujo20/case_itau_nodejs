@@ -1,7 +1,12 @@
-import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { DeleteClientDto } from 'src/client/domain/client.model';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+import { DeleteClientDto } from '../../domain/client.model';
 import { ClientManagerService } from '../services/clientManager.service';
 
+@Injectable()
 export class DeleteClientUseCase {
   constructor(private readonly clientService: ClientManagerService) {}
 

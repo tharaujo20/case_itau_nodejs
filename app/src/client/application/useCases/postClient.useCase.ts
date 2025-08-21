@@ -35,10 +35,13 @@ export class PostClientUseCase {
         '[PostClientUseCase][execute] Error while posting client:',
         error
       );
-      if (error instanceof ConflictException) throw error;
+      if (error instanceof ConflictException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error);
     }
   }
+
   private async checkIfClientExists(email: string): Promise<void> {
     const existingClient = await this.clientService.findByEmail(email);
 

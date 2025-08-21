@@ -38,18 +38,23 @@ export class DepositValueUseCase {
         `[DepositValueUseCase][execute] Error including money for client ${id}: `,
         error
       );
+
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(error);
     }
   }
 
-  private async checkIfClientExists(id: GetClientByIdDto): Promise<void> {
+  private async checkIfClientExists(client: GetClientByIdDto): Promise<void> {
     Logger.debug(
       '[DepositValueUSeCase][checkIfClientExists] Starting to check if the client exists...'
     );
-    const existingClient = await this.clientService.findOne(id);
+    const existingClient = await this.clientService.findOne(client);
 
     if (!existingClient) {
-      throw new BadRequestException(`Client with id ${id} not found`);
+      throw new BadRequestException(`Client with id ${client.id} not found`);
     }
   }
 }

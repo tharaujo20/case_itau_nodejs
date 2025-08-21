@@ -39,6 +39,11 @@ export class UpdateClientUseCase {
         `[UpdateClientUseCase][execute] Error updating client ${client.id}: `,
         error
       );
+
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(error);
     }
   }

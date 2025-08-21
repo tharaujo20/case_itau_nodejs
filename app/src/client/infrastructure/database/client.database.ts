@@ -16,13 +16,12 @@ export class ClientDatabase implements DatabaseService {
   private readonly sql: any;
 
   constructor(private readonly configService: ConfigService) {
-    this.db = new sqlite3.Database(':memory:');
-    this.sql = this.configService.get<string>('sql');
-
-    this.db.serialize(() => {
-      this.db.run(this.sql.createTableClientes);
-      this.db.run(this.sql.insertClient, ['TESTE', 'teste@teste.com.br', 0]);
-    });
+    // this.db = new sqlite3.Database(':memory:');
+    // this.sql = this.configService.get<string>('sql');
+    // this.db.serialize(() => {
+    //   this.db.run(this.sql.createTableClientes);
+    //   this.db.run(this.sql.insertClient, ['TESTE', 'teste@teste.com.br', 0]);
+    // });
   }
 
   public async getAll(): Promise<ClientCompleteDto[]> {

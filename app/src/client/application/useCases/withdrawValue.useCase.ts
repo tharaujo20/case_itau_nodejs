@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   Injectable,
   InternalServerErrorException,
@@ -38,6 +39,11 @@ export class WithdrawValueUseCase {
         `[WithdrawValueUseCase][execute] Error removing money for client ${id}: `,
         error
       );
+
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(error);
     }
   }

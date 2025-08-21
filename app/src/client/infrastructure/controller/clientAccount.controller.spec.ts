@@ -1,13 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
-import { DeleteClientUseCase } from '../../application/useCases/deleteClient.useCase';
-import { DepositValueUseCase } from '../../application/useCases/depositValue.useCase';
-import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
-import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
-import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
-import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
-import { ClientAccountController } from '../controller/clientAccount.controller';
+import { TransactionDto } from 'src/client/domain/account.model';
 import {
   ClientCompleteDto,
   CreateClientDto,
@@ -15,7 +9,13 @@ import {
   GetClientByIdDto,
   UpdateClientDto,
 } from 'src/client/domain/client.model';
-import { TransactionDto } from 'src/client/domain/account.model';
+import { DeleteClientUseCase } from '../../application/useCases/deleteClient.useCase';
+import { DepositValueUseCase } from '../../application/useCases/depositValue.useCase';
+import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
+import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
+import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
+import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
+import { ClientAccountController } from '../controller/clientAccount.controller';
 
 describe('ClientAccountController', () => {
   const chance = new Chance();
