@@ -9,19 +9,16 @@ import {
   GetClientByIdDto,
   UpdateClientDto,
 } from '../../domain/client.model';
+import { InitDatabase } from './init.database';
 
 @Injectable()
 export class ClientDatabase implements DatabaseService {
   private db: sqlite3.Database;
   private readonly sql: any;
 
-  constructor(private readonly configService: ConfigService) {
-    // this.db = new sqlite3.Database(':memory:');
-    // this.sql = this.configService.get<string>('sql');
-    // this.db.serialize(() => {
-    //   this.db.run(this.sql.createTableClientes);
-    //   this.db.run(this.sql.insertClient, ['TESTE', 'teste@teste.com.br', 0]);
-    // });
+  constructor(private readonly initDb: InitDatabase) {
+    this.db = this.initDb.getDatabase();
+    this.sql = this.initDb.getSql();
   }
 
   public async getAll(): Promise<ClientCompleteDto[]> {
@@ -85,7 +82,7 @@ export class ClientDatabase implements DatabaseService {
     return new Promise((resolve, reject) => {
       this.db.run(
         this.sql.insertClient,
-        [client.id, client.name, client.email, client.saldo],
+        [client.id, client.name, client.email, client.balance],
         function (error) {
           if (error) {
             Logger.error(

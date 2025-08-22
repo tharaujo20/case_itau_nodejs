@@ -22,7 +22,8 @@ export class PostClientUseCase {
         id: randomUUID(),
         name: newClient.name,
         email: newClient.email,
-        saldo: 0,
+        balance: 0,
+        password: newClient.password,
       };
 
       await this.clientService.addClient(client);
@@ -62,7 +63,7 @@ export class PostClientUseCase {
 // Padrão [NomeDaClasse][NomeDoMetodo] padrão de geração de log para melhor identificação ao debuggar e analisar logs, facilita manutenção
 // Custos: Correto uso dos tipos de logs visando custos.
 // Logar em produção somente sucessos (.log) e erros (.error), demais tipos até homol, a menos que seja identificada outra necessidade
-// Este caso de uso consome do serviço de clientes
+// Este caso de uso consome do serviço de clients
 // Caso de uso encapsula a camada de negócio prevista na arquitetura hexagonal
 // Abstrai da implementação da camada de aplicação
 // Reuso: Qualquer regra de negócio que precise CRIAR algo relacionado ao cliente, se serve deste caso de uso

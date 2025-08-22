@@ -16,4 +16,4 @@ export abstract class AccountManagerService {
 //camada de abstração
 //caso de uso consome deste serviço, mas não importa como o serviço consegue atendê-lo (implementação)
 //desacoplamento
-//tudo o que precisar de algo relacionado à CONTA pode consumir do serviço de clientes
+//tudo o que precisar de algo relacionado à CONTA pode consumir do serviço de clients

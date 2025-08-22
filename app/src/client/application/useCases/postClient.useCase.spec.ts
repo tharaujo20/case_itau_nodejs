@@ -43,6 +43,7 @@ describe('PostClientUseCase', () => {
     const newClient: CreateClientDto = {
       name: chance.name(),
       email: chance.email(),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
     jest.spyOn(clientService, 'findByEmail').mockResolvedValue(null);
     jest.spyOn(clientService, 'addClient').mockResolvedValue(undefined);
@@ -67,14 +68,16 @@ describe('PostClientUseCase', () => {
       id: chance.guid(),
       name: chance.name(),
       email: keyEmail,
-      saldo: chance.floating({ min: 100, max: 1000 }),
+      balance: chance.floating({ min: 100, max: 1000 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     const newClient = {
       id: chance.guid(),
       name: 'newClient',
       email: keyEmail,
-      saldo: 0,
+      balance: 0,
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     jest.spyOn(clientService, 'findByEmail').mockResolvedValue(oldClient);
@@ -100,7 +103,8 @@ describe('PostClientUseCase', () => {
       id: chance.guid(),
       name: chance.name(),
       email: chance.email(),
-      saldo: chance.floating({ min: 100, max: 1000 }),
+      balance: chance.floating({ min: 100, max: 1000 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     const error = new Error('fail');

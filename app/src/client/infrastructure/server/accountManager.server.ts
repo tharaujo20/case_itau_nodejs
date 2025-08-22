@@ -17,7 +17,7 @@ export class AccountManagerServer implements AccountManagerService {
       await this.databaseService.deposit(clientId, amount);
       const newBalanceResponse = await this.databaseService.getOne(clientId);
 
-      const updatedBalanceAccount: number = newBalanceResponse.saldo;
+      const updatedBalanceAccount: number = newBalanceResponse.balance;
 
       Logger.log('[AccountManagerServer][deposit] Deposit done successfully');
       return updatedBalanceAccount;
@@ -41,7 +41,7 @@ export class AccountManagerServer implements AccountManagerService {
       await this.databaseService.withdraw(clientId, amount);
       const newBalanceResponse = await this.databaseService.getOne(clientId);
 
-      const updatedBalanceAccount: number = newBalanceResponse.saldo;
+      const updatedBalanceAccount: number = newBalanceResponse.balance;
 
       Logger.log('[AccountManagerServer][withdraw] Withdraw done successfully');
       return updatedBalanceAccount;

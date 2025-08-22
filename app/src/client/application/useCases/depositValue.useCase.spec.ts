@@ -1,19 +1,15 @@
 import {
-  Logger,
   BadRequestException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
-import { DepositValueUseCase } from './depositValue.useCase';
+import { TransactionDto } from '../../domain/account.model';
+import { ClientCompleteDto, GetClientByIdDto } from '../../domain/client.model';
 import { AccountManagerService } from '../services/accountManager.service';
 import { ClientManagerService } from '../services/clientManager.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import {
-  ClientCompleteDto,
-  CreateClientDto,
-  GetClientByIdDto,
-} from '../../domain/client.model';
-import { TransactionDto } from '../../domain/account.model';
+import { DepositValueUseCase } from './depositValue.useCase';
 
 describe('DepositValueUseCase', () => {
   const chance = new Chance();
@@ -61,9 +57,10 @@ describe('DepositValueUseCase', () => {
       id: clientId.id,
       name: chance.name(),
       email: chance.email(),
-      saldo: chance.floating({ min: 100, max: 1000 }),
+      balance: chance.floating({ min: 100, max: 1000 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
-    const balance = existentClient.saldo + amount.amount;
+    const balance = existentClient.balance + amount.amount;
 
     jest.spyOn(accountService, 'deposit').mockResolvedValue(balance);
     jest.spyOn(clientService, 'findOne').mockResolvedValue(existentClient);
@@ -77,7 +74,7 @@ describe('DepositValueUseCase', () => {
     expect(clientService.findOne).toHaveBeenCalledWith(clientId);
     expect(accountService.deposit).toHaveBeenCalledWith(clientId, amount);
     expect(result).toBe(balance);
-    expect(balance).toBeGreaterThan(existentClient.saldo);
+    expect(balance).toBeGreaterThan(existentClient.balance);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
   });

@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
-import { TransactionDto } from 'src/client/domain/account.model';
 import {
   ClientCompleteDto,
   CreateClientDto,
@@ -15,6 +14,7 @@ import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
 import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
 import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
 import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
+import { SecurityDto, TransactionDto } from '../../domain/account.model';
 import { ClientAccountController } from '../controller/clientAccount.controller';
 
 describe('ClientAccountController', () => {
@@ -72,13 +72,15 @@ describe('ClientAccountController', () => {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
-        saldo: chance.floating({ min: 1, max: 1000 }),
+        balance: chance.floating({ min: 1, max: 1000 }),
+        password: chance.integer({ min: 1000, max: 9999 }),
       },
       {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
-        saldo: chance.floating({ min: 1, max: 1000 }),
+        balance: chance.floating({ min: 1, max: 1000 }),
+        password: chance.integer({ min: 1000, max: 9999 }),
       },
     ];
 
@@ -101,7 +103,8 @@ describe('ClientAccountController', () => {
       id: chance.guid(),
       name: chance.name(),
       email: chance.email(),
-      saldo: chance.floating({ min: 1, max: 1000 }),
+      balance: chance.floating({ min: 1, max: 1000 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     jest.spyOn(getClientUseCase, 'execute').mockResolvedValue(result);
@@ -121,6 +124,7 @@ describe('ClientAccountController', () => {
     const client: CreateClientDto = {
       name: chance.name(),
       email: chance.email(),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     jest.spyOn(postClientUseCase, 'execute').mockResolvedValue(undefined);
@@ -195,15 +199,22 @@ describe('ClientAccountController', () => {
       amount: chance.floating({ min: 1, max: 1000 }),
     };
     const result: number = chance.floating({ min: 1, max: 1000 });
+    const password: SecurityDto = {
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
 
     jest.spyOn(withdrawValueUseCase, 'execute').mockResolvedValue(result);
     jest.spyOn(Logger, 'debug').mockImplementation();
 
     // Act
-    const response = await controller.withdrawMoney(id, amount);
+    const response = await controller.withdrawMoney(id, amount, password);
 
     // Assert
-    expect(withdrawValueUseCase.execute).toHaveBeenCalledWith(id, amount);
+    expect(withdrawValueUseCase.execute).toHaveBeenCalledWith(
+      id,
+      amount,
+      password
+    );
     expect(response).toBe(result);
     expect(Logger.debug).toHaveBeenCalled();
   });

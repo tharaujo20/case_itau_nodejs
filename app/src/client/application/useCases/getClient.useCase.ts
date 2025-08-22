@@ -38,11 +38,11 @@ export class GetClientUseCase {
 // Padrão [NomeDaClasse][NomeDoMetodo] padrão de geração de log para melhor identificação ao debuggar e analisar logs, facilita manutenção
 // Custos: Correto uso dos tipos de logs visando custos.
 // Logar em produção somente sucessos (.log) e erros (.error), demais tipos até homol, a menos que seja identificada outra necessidade
-// Este caso de uso consome do serviço de clientes
+// Este caso de uso consome do serviço de clients
 // Caso de uso encapsula a camada de negócio prevista na arquitetura hexagonal
 // Abstrai da implementação da camada de aplicação
 // Reuso: Qualquer regra de negócio que precise BUSCAR relacionado ao cliente, se serve deste caso de uso
 // Resiliência: bloco try/catch na camada de caso de uso para tratativa do comportamento da regra
-// Caso de uso de busca, as trataivas de negócio são aplicadas nessa camada (ex. se um ou todos os clientes)
+// Caso de uso de busca, as trataivas de negócio são aplicadas nessa camada (ex. se um ou todos os clients)
 
 //Framework nest, arquitura hexagonal, princípios CleanCode, otimização de custos

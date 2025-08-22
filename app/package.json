@@ -46,7 +46,8 @@
       "/node_modules/",
       "/dist/",
       "app.module.ts",
-      "main.ts"
+      "main.ts",
+      "/config/"
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",

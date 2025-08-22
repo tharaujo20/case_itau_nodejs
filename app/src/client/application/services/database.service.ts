@@ -1,4 +1,4 @@
-import { TransactionDto } from 'src/client/domain/account.model';
+import { TransactionDto } from '../../domain/account.model';
 import {
   ClientCompleteDto,
   CreateClientDto,

@@ -1,9 +1,9 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
+import { DeleteClientDto } from '../../domain/client.model';
 import { ClientManagerService } from '../services/clientManager.service';
 import { DeleteClientUseCase } from '../useCases/deleteClient.useCase';
-import { DeleteClientDto } from '../../domain/client.model';
 
 describe('DeleteClientUseCase', () => {
   const chance = new Chance();

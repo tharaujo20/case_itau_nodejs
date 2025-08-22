@@ -1,18 +1,19 @@
 import {
-  Logger,
   BadRequestException,
   InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { Chance } from 'chance';
-import { WithdrawValueUseCase } from './withdrawValue.useCase';
-import { AccountManagerService } from '../services/accountManager.service';
-import { ClientManagerService } from '../services/clientManager.service';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Chance } from 'chance';
+import { SecurityDto, TransactionDto } from 'src/client/domain/account.model';
 import {
   ClientCompleteDto,
   GetClientByIdDto,
 } from 'src/client/domain/client.model';
-import { TransactionDto } from 'src/client/domain/account.model';
+import { AccountManagerService } from '../services/accountManager.service';
+import { ClientManagerService } from '../services/clientManager.service';
+import { WithdrawValueUseCase } from './withdrawValue.useCase';
 
 describe('WithdrawValueUseCase', () => {
   const chance = new Chance();
@@ -51,19 +52,23 @@ describe('WithdrawValueUseCase', () => {
     expect(clientService).toBeDefined();
   });
 
-  it('should withdraw value if client exists', async () => {
+  it('should withdraw value if client exists and match password', async () => {
     // Arrange
     const clientId: GetClientByIdDto = { id: chance.guid() };
     const amount: TransactionDto = {
       amount: chance.floating({ min: 1, max: 200 }),
     };
+    const password: SecurityDto = {
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     const existentClient: ClientCompleteDto = {
       id: clientId.id,
       name: chance.name(),
       email: chance.email(),
-      saldo: chance.floating({ min: 100, max: 1000 }),
+      balance: chance.floating({ min: 100, max: 1000 }),
+      password: password.password,
     };
-    const balance = existentClient.saldo - amount.amount;
+    const balance = existentClient.balance - amount.amount;
 
     jest.spyOn(accountService, 'withdraw').mockResolvedValue(balance);
     jest.spyOn(clientService, 'findOne').mockResolvedValue(existentClient);
@@ -71,13 +76,17 @@ describe('WithdrawValueUseCase', () => {
     jest.spyOn(Logger, 'log').mockImplementation();
 
     // Act
-    const result = await withdrawValueUseCase.execute(clientId, amount);
+    const result = await withdrawValueUseCase.execute(
+      clientId,
+      amount,
+      password
+    );
 
     // Assert
     expect(clientService.findOne).toHaveBeenCalledWith(clientId);
     expect(accountService.withdraw).toHaveBeenCalledWith(clientId, amount);
     expect(result).toBe(balance);
-    expect(balance).toBeLessThan(existentClient.saldo);
+    expect(balance).toBeLessThan(existentClient.balance);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
   });
@@ -88,6 +97,9 @@ describe('WithdrawValueUseCase', () => {
     const amount: TransactionDto = {
       amount: chance.floating({ min: 1, max: 1000 }),
     };
+    const password: SecurityDto = {
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
 
     jest.spyOn(accountService, 'withdraw').mockResolvedValue(undefined);
     jest.spyOn(clientService, 'findOne').mockResolvedValue(undefined);
@@ -96,12 +108,55 @@ describe('WithdrawValueUseCase', () => {
 
     try {
       // Act
-      const result = await withdrawValueUseCase.execute(clientId, amount);
+      const result = await withdrawValueUseCase.execute(
+        clientId,
+        amount,
+        password
+      );
     } catch (error) {
       //Assert
-      expect(withdrawValueUseCase.execute(clientId, amount)).rejects.toThrow(
-        BadRequestException
+      expect(
+        withdrawValueUseCase.execute(clientId, amount, password)
+      ).rejects.toThrow(BadRequestException);
+      expect(Logger.debug).toHaveBeenCalled();
+      expect(Logger.error).toHaveBeenCalled();
+    }
+  });
+
+  it('should throw UnauthorizedException if password does not match', async () => {
+    // Arrange
+    const clientId: GetClientByIdDto = { id: chance.guid() };
+    const existentClient: ClientCompleteDto = {
+      id: clientId.id,
+      name: chance.name(),
+      email: chance.email(),
+      balance: chance.floating({ min: 100, max: 1000 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
+    const amount: TransactionDto = {
+      amount: chance.floating({ min: 1, max: 1000 }),
+    };
+    const password: SecurityDto = {
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
+
+    jest.spyOn(accountService, 'withdraw').mockResolvedValue(undefined);
+    jest.spyOn(clientService, 'findOne').mockResolvedValue(existentClient);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+    jest.spyOn(Logger, 'error').mockImplementation();
+
+    try {
+      // Act
+      const result = await withdrawValueUseCase.execute(
+        clientId,
+        amount,
+        password
       );
+    } catch (error) {
+      //Assert
+      expect(
+        withdrawValueUseCase.execute(clientId, amount, password)
+      ).rejects.toThrow(UnauthorizedException);
       expect(Logger.debug).toHaveBeenCalled();
       expect(Logger.error).toHaveBeenCalled();
     }
@@ -113,6 +168,9 @@ describe('WithdrawValueUseCase', () => {
     const amount: TransactionDto = {
       amount: chance.floating({ min: 1, max: 1000 }),
     };
+    const password: SecurityDto = {
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     const rejectedError = 'unknown error';
 
     jest.spyOn(accountService, 'withdraw').mockResolvedValue(undefined);
@@ -122,12 +180,16 @@ describe('WithdrawValueUseCase', () => {
 
     try {
       //Act
-      const result = await withdrawValueUseCase.execute(clientId, amount);
+      const result = await withdrawValueUseCase.execute(
+        clientId,
+        amount,
+        password
+      );
     } catch (error) {
       //Assert
-      expect(withdrawValueUseCase.execute(clientId, amount)).rejects.toThrow(
-        InternalServerErrorException
-      );
+      expect(
+        withdrawValueUseCase.execute(clientId, amount, password)
+      ).rejects.toThrow(InternalServerErrorException);
       expect(Logger.debug).toHaveBeenCalled();
       expect(Logger.error).toHaveBeenCalled();
     }

@@ -4,10 +4,10 @@ import sqlite3 from 'sqlite3';
 
 @Injectable()
 export class InitDatabase implements OnModuleInit {
-  constructor(private readonly configService: ConfigService) {}
-
   private db: sqlite3.Database;
   private sql: any;
+
+  constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
     this.db = new sqlite3.Database(':memory:');
@@ -15,7 +15,20 @@ export class InitDatabase implements OnModuleInit {
 
     this.db.serialize(() => {
       this.db.run(this.sql.createTableClientes);
-      this.db.run(this.sql.insertClient, ['TESTE', 'teste@teste.com.br', 0]);
+      this.db.run(this.sql.insertClient, [
+        'TESTE',
+        'teste@teste.com.br',
+        0,
+        8765,
+      ]);
     });
+  }
+
+  getDatabase(): sqlite3.Database {
+    return this.db;
+  }
+
+  getSql(): any {
+    return this.sql;
   }
 }

@@ -1,6 +1,8 @@
 import {
   IsEmail,
+  IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -20,6 +22,10 @@ export class CreateClientDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  password: number;
 }
 
 export class UpdateClientDto {
@@ -34,6 +40,10 @@ export class UpdateClientDto {
   @IsEmail()
   @IsOptional()
   email?: string;
+
+  @IsInt()
+  @IsOptional()
+  password?: number;
 }
 
 export class DeleteClientDto {
@@ -46,5 +56,6 @@ export class ClientCompleteDto {
   id: string;
   name: string;
   email: string;
-  saldo: number;
+  balance: number;
+  password: number;
 }

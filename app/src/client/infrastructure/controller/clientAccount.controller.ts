@@ -14,7 +14,7 @@ import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
 import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
 import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
 import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
-import { TransactionDto } from '../../domain/account.model';
+import { SecurityDto, TransactionDto } from '../../domain/account.model';
 import {
   ClientCompleteDto,
   CreateClientDto,
@@ -23,7 +23,7 @@ import {
   UpdateClientDto,
 } from '../../domain/client.model';
 
-@Controller('clientes')
+@Controller('clients')
 export class ClientAccountController {
   constructor(
     private readonly getClientUseCase: GetClientUseCase,
@@ -90,12 +90,13 @@ export class ClientAccountController {
   @Post(':id/sacar')
   async withdrawMoney(
     @Param('id') id: GetClientByIdDto,
-    @Body() amount: TransactionDto
+    @Body() amount: TransactionDto,
+    @Body() password: SecurityDto
   ): Promise<number> {
     Logger.debug(
       '[ClientAccountController][withdrawMoney] Calling the use case...'
     );
-    return await this.withdrawValueUseCase.execute(id, amount);
+    return await this.withdrawValueUseCase.execute(id, amount, password);
   }
 }
 

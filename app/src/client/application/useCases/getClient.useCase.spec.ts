@@ -1,13 +1,12 @@
-import { Logger, InternalServerErrorException } from '@nestjs/common';
-import { Chance } from 'chance';
-import { GetClientUseCase } from './getClient.useCase';
-import { ClientManagerService } from '../services/clientManager.service';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Chance } from 'chance';
 import {
   ClientCompleteDto,
   GetClientByIdDto,
 } from 'src/client/domain/client.model';
-import { min } from 'class-validator';
+import { ClientManagerService } from '../services/clientManager.service';
+import { GetClientUseCase } from './getClient.useCase';
 
 describe('GetClientUseCase', () => {
   const chance = new Chance();
@@ -45,7 +44,8 @@ describe('GetClientUseCase', () => {
       id: clientId.id,
       name: chance.name(),
       email: chance.email(),
-      saldo: chance.floating({ min: 100, max: 1000 }),
+      balance: chance.floating({ min: 100, max: 1000 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
     jest.spyOn(clientService, 'findOne').mockResolvedValue(existentClient);
     jest.spyOn(Logger, 'debug').mockImplementation();
@@ -68,19 +68,22 @@ describe('GetClientUseCase', () => {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
-        saldo: chance.floating({ min: 100, max: 1000 }),
+        balance: chance.floating({ min: 100, max: 1000 }),
+        password: chance.integer({ min: 1000, max: 9999 }),
       },
       {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
-        saldo: chance.floating({ min: 100, max: 1000 }),
+        balance: chance.floating({ min: 100, max: 1000 }),
+        password: chance.integer({ min: 1000, max: 9999 }),
       },
       {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
-        saldo: chance.floating({ min: 100, max: 1000 }),
+        balance: chance.floating({ min: 100, max: 1000 }),
+        password: chance.integer({ min: 1000, max: 9999 }),
       },
     ];
 
