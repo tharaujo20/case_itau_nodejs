@@ -1,13 +1,13 @@
 import {
-  Logger,
   ConflictException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
-import { Chance } from 'chance';
-import { PostClientUseCase } from './postClient.useCase';
-import { ClientManagerService } from '../services/clientManager.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ClientCompleteDto, CreateClientDto } from '../../domain/client.model';
+import { Chance } from 'chance';
+import { CreateClientDto } from '../../domain/client.model';
+import { ClientManagerService } from '../services/clientManager.service';
+import { PostClientUseCase } from './postClient.useCase';
 
 describe('PostClientUseCase', () => {
   const chance = new Chance();

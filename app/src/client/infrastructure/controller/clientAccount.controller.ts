@@ -14,16 +14,16 @@ import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
 import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
 import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
 import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
-import { SecurityDto, TransactionDto } from '../../domain/account.model';
+import { SafeWithdrawDto, TransactionDto } from '../../domain/account.model';
 import {
-  ClientCompleteDto,
+  ClientResult,
   CreateClientDto,
   DeleteClientDto,
   GetClientByIdDto,
   UpdateClientDto,
 } from '../../domain/client.model';
 
-@Controller('clients')
+@Controller('clientes')
 export class ClientAccountController {
   constructor(
     private readonly getClientUseCase: GetClientUseCase,
@@ -35,7 +35,7 @@ export class ClientAccountController {
   ) {}
 
   @Get()
-  async getAllClients(): Promise<ClientCompleteDto | ClientCompleteDto[]> {
+  async getAllClients(): Promise<ClientResult | ClientResult[]> {
     Logger.debug(
       '[ClientAccountController][getAllClients] Calling the use case...'
     );
@@ -44,15 +44,15 @@ export class ClientAccountController {
 
   @Get(':id')
   async getClientById(
-    @Param('id') id: GetClientByIdDto
-  ): Promise<ClientCompleteDto | ClientCompleteDto[]> {
+    @Param() id: GetClientByIdDto
+  ): Promise<ClientResult | ClientResult[]> {
     Logger.debug(
       '[ClientAccountController][getClientById] Calling the use case...'
     );
     return this.getClientUseCase.execute(id);
   }
 
-  @Post('/cliente')
+  @Post('/novo')
   async postNewClient(@Body() client: CreateClientDto): Promise<void> {
     Logger.debug(
       '[ClientAccountController][postNewClient] Calling the use case...'
@@ -60,7 +60,7 @@ export class ClientAccountController {
     await this.postClientUseCase.execute(client);
   }
 
-  @Put(':id')
+  @Put()
   async updateClient(@Body() client: UpdateClientDto): Promise<void> {
     Logger.debug(
       '[ClientAccountController][updateClient] Calling the use case...'
@@ -69,7 +69,7 @@ export class ClientAccountController {
   }
 
   @Delete(':id')
-  async deleteClient(@Param('id') id: DeleteClientDto): Promise<void> {
+  async deleteClient(@Param() id: DeleteClientDto): Promise<void> {
     Logger.debug(
       '[ClientAccountController][deleteClient] Calling the use case...'
     );
@@ -78,7 +78,7 @@ export class ClientAccountController {
 
   @Post(':id/depositar')
   async depositMoney(
-    @Param('id') id: GetClientByIdDto,
+    @Param() id: GetClientByIdDto,
     @Body() amount: TransactionDto
   ): Promise<number> {
     Logger.debug(
@@ -89,14 +89,13 @@ export class ClientAccountController {
 
   @Post(':id/sacar')
   async withdrawMoney(
-    @Param('id') id: GetClientByIdDto,
-    @Body() amount: TransactionDto,
-    @Body() password: SecurityDto
+    @Param() id: GetClientByIdDto,
+    @Body() withdrawData: SafeWithdrawDto
   ): Promise<number> {
     Logger.debug(
       '[ClientAccountController][withdrawMoney] Calling the use case...'
     );
-    return await this.withdrawValueUseCase.execute(id, amount, password);
+    return await this.withdrawValueUseCase.execute(id, withdrawData);
   }
 }
 

@@ -1,21 +1,18 @@
-import { TransactionDto } from '../../domain/account.model';
 import {
   ClientCompleteDto,
   CreateClientDto,
-  DeleteClientDto,
-  GetClientByIdDto,
   UpdateClientDto,
 } from '../../domain/client.model';
 
 export abstract class DatabaseService {
   abstract getAll(): Promise<ClientCompleteDto[]>;
-  abstract getOne(clientId: GetClientByIdDto): Promise<ClientCompleteDto>;
+  abstract getOne(clientId: string): Promise<ClientCompleteDto>;
   abstract getByEmail(email: string): Promise<ClientCompleteDto | null>;
   abstract create(client: CreateClientDto): Promise<void>;
   abstract update(client: UpdateClientDto): Promise<void>;
-  abstract delete(client: DeleteClientDto): Promise<void>;
-  abstract deposit(id: GetClientByIdDto, amount: TransactionDto): Promise<void>;
-  abstract withdraw(id: GetClientByIdDto, amout: TransactionDto): Promise<void>;
+  abstract delete(client: string): Promise<void>;
+  abstract deposit(id: string, amount: number): Promise<void>;
+  abstract withdraw(id: string, amout: number): Promise<void>;
 }
 
 //camada de abstração

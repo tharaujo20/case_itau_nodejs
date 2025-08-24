@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
 import sqlite3 from 'sqlite3';
 
 @Injectable()
@@ -16,6 +17,7 @@ export class InitDatabase implements OnModuleInit {
     this.db.serialize(() => {
       this.db.run(this.sql.createTableClientes);
       this.db.run(this.sql.insertClient, [
+        randomUUID(),
         'TESTE',
         'teste@teste.com.br',
         0,

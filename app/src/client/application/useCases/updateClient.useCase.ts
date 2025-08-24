@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import {
   ClientCompleteDto,
+  ClientResult,
   GetClientByIdDto,
   UpdateClientDto,
 } from '../../domain/client.model';
@@ -27,6 +28,7 @@ export class UpdateClientUseCase {
         ...existingClient,
         name: client.name ?? existingClient.name,
         email: client.email ?? existingClient.email,
+        password: client.password ?? existingClient.password,
       };
 
       await this.clientService.updateClient(updatedClient);
@@ -52,9 +54,9 @@ export class UpdateClientUseCase {
     Logger.debug(
       '[UpdateClientUseCase][checkIfClientExists] Starting to check if the client exists...'
     );
-    const existingClient = await this.clientService.findOne(
-      id as unknown as GetClientByIdDto
-    );
+    const existingClient = await this.clientService.findOne({
+      id: id,
+    } as GetClientByIdDto);
 
     if (!existingClient) {
       throw new BadRequestException(`Client with id ${id} not found`);

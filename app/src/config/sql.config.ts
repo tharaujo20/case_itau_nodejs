@@ -1,7 +1,7 @@
 export default () => ({
   sql: {
-    createTableClientes: `CREATE TABLE clients( id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, balance FLOAT NOT NULL DEFAULT 0, password INTEGER NOT NULL )`,
-    insertClient: `INSERT INTO clients(name, email, balance, password) VALUES(?, ?, ?, ?)`,
+    createTableClientes: `CREATE TABLE clients(id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, balance FLOAT NOT NULL DEFAULT 0, password INTEGER NOT NULL )`,
+    insertClient: `INSERT INTO clients(id, name, email, balance, password) VALUES(?, ?, ?, ?, ?)`,
     selectAllClients: `SELECT * FROM clients`,
     selectClientById: `SELECT * FROM clients WHERE id = ?`,
     selectByEmail: `SELECT * FROM clients WHERE email = ?`,

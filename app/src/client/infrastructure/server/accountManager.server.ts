@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TransactionDto } from 'src/client/domain/account.model';
+import {
+  SafeWithdrawDto,
+  TransactionDto,
+} from 'src/client/domain/account.model';
 import { AccountManagerService } from '../../application/services/accountManager.service';
 import { DatabaseService } from '../../application/services/database.service';
 import { GetClientByIdDto } from '../../domain/client.model';
@@ -14,8 +17,8 @@ export class AccountManagerServer implements AccountManagerService {
   ): Promise<number> {
     try {
       Logger.debug('[AccountManagerServer][deposit] Calling method...');
-      await this.databaseService.deposit(clientId, amount);
-      const newBalanceResponse = await this.databaseService.getOne(clientId);
+      await this.databaseService.deposit(clientId.id, amount.amount);
+      const newBalanceResponse = await this.databaseService.getOne(clientId.id);
 
       const updatedBalanceAccount: number = newBalanceResponse.balance;
 
@@ -34,12 +37,12 @@ export class AccountManagerServer implements AccountManagerService {
 
   public async withdraw(
     clientId: GetClientByIdDto,
-    amount: TransactionDto
+    amount: SafeWithdrawDto
   ): Promise<number> {
     try {
       Logger.debug('[AccountManagerServer][withdraw] Calling method...');
-      await this.databaseService.withdraw(clientId, amount);
-      const newBalanceResponse = await this.databaseService.getOne(clientId);
+      await this.databaseService.withdraw(clientId.id, amount.amount);
+      const newBalanceResponse = await this.databaseService.getOne(clientId.id);
 
       const updatedBalanceAccount: number = newBalanceResponse.balance;
 

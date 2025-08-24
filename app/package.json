@@ -24,8 +24,10 @@
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
     "@nestjs/testing": "^11.1.6",
     "chance": "^1.1.13",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "crypto": "^1.0.1",
     "sqlite3": "^5.1.7"
@@ -46,6 +48,7 @@
       "/node_modules/",
       "/dist/",
       "app.module.ts",
+      "client.module.ts",
       "main.ts",
       "/config/"
     ],

@@ -22,7 +22,7 @@ export class PostClientUseCase {
         id: randomUUID(),
         name: newClient.name,
         email: newClient.email,
-        balance: 0,
+        balance: newClient.balance,
         password: newClient.password,
       };
 

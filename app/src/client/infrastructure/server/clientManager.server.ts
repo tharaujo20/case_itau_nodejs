@@ -3,6 +3,7 @@ import { ClientManagerService } from '../../application/services/clientManager.s
 import { DatabaseService } from '../../application/services/database.service';
 import {
   ClientCompleteDto,
+  ClientResult,
   CreateClientDto,
   DeleteClientDto,
   GetClientByIdDto,
@@ -18,7 +19,7 @@ export class ClientManagerServer implements ClientManagerService {
       Logger.debug('[ClientManagerServer][findAll] Calling method...');
       const response: ClientCompleteDto[] = await this.databaseService.getAll();
 
-      Logger.log('[ClientManagerServer][findAll] response:', response);
+      Logger.log('[ClientManagerServer][findAll] response: success');
       return response;
     } catch (error) {
       Logger.error(
@@ -35,30 +36,34 @@ export class ClientManagerServer implements ClientManagerService {
     try {
       Logger.debug('[ClientManagerServer][findOne] Calling method...');
       const response: ClientCompleteDto = await this.databaseService.getOne(
-        clientId
+        clientId.id
       );
 
-      Logger.log('[ClientManagerServer][findOne] response:', response);
+      if (!response) {
+        throw new Error(`Client ${clientId.id} not found`);
+      }
+
+      Logger.log('[ClientManagerServer][findOne] response: success');
       return response;
     } catch (error) {
       Logger.error(
-        `[ClientManagerServer][findOne] Error while getting the client ${clientId}: `,
+        `[ClientManagerServer][findOne] Error while getting the client ${clientId.id}: `,
         error
       );
       throw new Error(
-        `[ClientManagerServer][findAll] Error while getting the client ${clientId}: ${error}`
+        `[ClientManagerServer][findAll] Error while getting the client ${clientId.id}: ${error}`
       );
     }
   }
 
-  public async findByEmail(email: string) {
+  public async findByEmail(email: string): Promise<ClientCompleteDto> {
     try {
       Logger.debug('[ClientManagerServer][findByEmail] Calling method...');
       const response: ClientCompleteDto = await this.databaseService.getByEmail(
         email
       );
 
-      Logger.log('[ClientManagerServer][findByEmail] response:', response);
+      Logger.log('[ClientManagerServer][findByEmail] response: success');
       return response;
     } catch (error) {
       Logger.error(
@@ -112,10 +117,10 @@ export class ClientManagerServer implements ClientManagerService {
   public async deleteClient(id: DeleteClientDto): Promise<void> {
     try {
       Logger.debug('[ClientManagerServer][deleteClient] Calling method...');
-      await this.databaseService.delete(id);
+      await this.databaseService.delete(id.id);
 
       Logger.log(
-        '[ClientManagerServer][deleteClient] client ${updatedClient.id} updated successfully:'
+        `[ClientManagerServer][deleteClient] client ${id.id} deleted successfully`
       );
     } catch (error) {
       Logger.error(

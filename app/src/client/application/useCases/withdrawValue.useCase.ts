@@ -5,7 +5,7 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SecurityDto, TransactionDto } from '../../domain/account.model';
+import { SafeWithdrawDto, TransactionDto } from '../../domain/account.model';
 import { ClientCompleteDto, GetClientByIdDto } from '../../domain/client.model';
 import { AccountManagerService } from '../services/accountManager.service';
 import { ClientManagerService } from '../services/clientManager.service';
@@ -19,26 +19,25 @@ export class WithdrawValueUseCase {
 
   public async execute(
     id: GetClientByIdDto,
-    amount: TransactionDto,
-    password: SecurityDto
+    withdraw: SafeWithdrawDto
   ): Promise<number> {
     try {
       Logger.debug(
-        `[WithdrawValueUseCase][execute] Starting withdrawing money for clientId: ${id}`
+        `[WithdrawValueUseCase][execute] Starting withdrawing money for clientId: ${id.id}`
       );
 
       const existingClient = await this.checkIfClientExists(id);
-      await this.checkPassword(existingClient, password);
+      await this.checkPassword(existingClient, withdraw);
 
-      const result = await this.accountService.withdraw(id, amount);
+      const result = await this.accountService.withdraw(id, withdraw);
 
       Logger.log(
-        `[WithdrawValueUseCase][execute] Success: value ${amount} removed for client ${id}. New balance is ${result}`
+        `[WithdrawValueUseCase][execute] Success: value ${withdraw.amount} removed for client ${id.id}. New balance is ${result}`
       );
       return result;
     } catch (error) {
       Logger.error(
-        `[WithdrawValueUseCase][execute] Error removing money for client ${id}: `,
+        `[WithdrawValueUseCase][execute] Error removing money for client ${id.id}: `,
         error
       );
 
@@ -70,7 +69,7 @@ export class WithdrawValueUseCase {
 
   private async checkPassword(
     existingClient: ClientCompleteDto,
-    password: SecurityDto
+    password: SafeWithdrawDto
   ): Promise<boolean> {
     if (existingClient.password !== password.password) {
       throw new UnauthorizedException(

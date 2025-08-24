@@ -1,4 +1,4 @@
-import { TransactionDto } from '../../domain/account.model';
+import { SafeWithdrawDto, TransactionDto } from '../../domain/account.model';
 import { GetClientByIdDto } from '../../domain/client.model';
 
 export abstract class AccountManagerService {
@@ -8,7 +8,7 @@ export abstract class AccountManagerService {
   ): Promise<number>;
   abstract withdraw(
     id: GetClientByIdDto,
-    amount: TransactionDto
+    amount: SafeWithdrawDto
   ): Promise<number>;
 }
 

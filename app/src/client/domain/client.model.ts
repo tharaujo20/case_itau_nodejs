@@ -24,6 +24,10 @@ export class CreateClientDto {
   email: string;
 
   @IsNumber()
+  @IsOptional()
+  balance?: number;
+
+  @IsNumber()
   @IsNotEmpty()
   password: number;
 }
@@ -52,10 +56,28 @@ export class DeleteClientDto {
   id: string;
 }
 
-export class ClientCompleteDto {
+export type ClientCompleteDto = {
   id: string;
   name: string;
   email: string;
   balance: number;
   password: number;
+};
+
+export type ClientResult = {
+  id: string;
+  name: string;
+  email: string;
+  balance: number;
+};
+
+export class Adapter {
+  static adapter(complete: ClientCompleteDto): ClientResult {
+    return {
+      id: complete.id,
+      name: complete.name,
+      email: complete.email,
+      balance: complete.balance,
+    };
+  }
 }

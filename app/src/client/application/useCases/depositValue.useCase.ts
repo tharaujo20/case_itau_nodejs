@@ -22,7 +22,7 @@ export class DepositValueUseCase {
   ): Promise<number> {
     try {
       Logger.debug(
-        `[DepositValueUseCase][execute] Starting depositing money for clientId: ${id}`
+        `[DepositValueUseCase][execute] Starting depositing money for clientId: ${id.id}`
       );
 
       await this.checkIfClientExists(id);
@@ -30,7 +30,7 @@ export class DepositValueUseCase {
       const result = await this.accountService.deposit(id, amount);
 
       Logger.log(
-        `[DepositValueUseCase][execute] Success: value ${amount} included for client ${id}. New balance is ${result}`
+        `[DepositValueUseCase][execute] Success: value ${amount.amount} included for client ${id.id}. New balance is ${result}`
       );
       return result;
     } catch (error) {

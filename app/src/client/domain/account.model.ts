@@ -6,10 +6,14 @@ export class TransactionDto {
   amount: number;
 }
 
-export class SecurityDto {
+export class SafeWithdrawDto {
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+
   @IsInt()
-  @Min(1000, { message: 'A password deve ter 4 dígitos' })
-  @Max(9999, { message: 'A password deve ter 4 dígitos' })
+  @Min(1000, { message: 'A senha deve ter 4 dígitos' })
+  @Max(9999, { message: 'A senha deve ter 4 dígitos' })
   @IsNotEmpty()
   password: number;
 }

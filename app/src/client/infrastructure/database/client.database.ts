@@ -1,24 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import sqlite3 from 'sqlite3';
-import { TransactionDto } from 'src/client/domain/account.model';
 import { DatabaseService } from '../../application/services/database.service';
-import {
-  ClientCompleteDto,
-  DeleteClientDto,
-  GetClientByIdDto,
-  UpdateClientDto,
-} from '../../domain/client.model';
+import { ClientCompleteDto, UpdateClientDto } from '../../domain/client.model';
 import { InitDatabase } from './init.database';
 
 @Injectable()
 export class ClientDatabase implements DatabaseService {
-  private db: sqlite3.Database;
-  private readonly sql: any;
+  constructor(private readonly initDb: InitDatabase) {}
 
-  constructor(private readonly initDb: InitDatabase) {
-    this.db = this.initDb.getDatabase();
-    this.sql = this.initDb.getSql();
+  private get db(): sqlite3.Database {
+    return this.initDb.getDatabase();
+  }
+
+  private get sql(): any {
+    return this.initDb.getSql();
   }
 
   public async getAll(): Promise<ClientCompleteDto[]> {
@@ -32,13 +27,13 @@ export class ClientDatabase implements DatabaseService {
           return reject(error);
         }
 
-        Logger.log('[ClientDatabase][getAll] Clients retrieved sucessfully');
+        Logger.log('[ClientDatabase][getAll] Clients retrieved successfully');
         resolve(all as ClientCompleteDto[]);
       });
     });
   }
 
-  public async getOne(clientId: GetClientByIdDto): Promise<ClientCompleteDto> {
+  public async getOne(clientId: string): Promise<ClientCompleteDto> {
     return new Promise((resolve, reject) => {
       this.db.get(this.sql.selectClientById, [clientId], (error, item) => {
         if (error) {
@@ -50,7 +45,7 @@ export class ClientDatabase implements DatabaseService {
         }
 
         Logger.log(
-          `[ClientDatabase][getOne] Client ${clientId} retrieved sucessfully`
+          `[ClientDatabase][getOne] Client ${clientId} retrieved successfully`
         );
 
         resolve(item as ClientCompleteDto);
@@ -63,14 +58,14 @@ export class ClientDatabase implements DatabaseService {
       this.db.get(this.sql.selectByEmail, [email], (error, item) => {
         if (error) {
           Logger.error(
-            `[ClientDatabase][getOne] Error while getting the client by email ${email}`,
+            `[ClientDatabase][getByEmail] Error while getting the client by email ${email}`,
             error
           );
           return reject(error);
         }
 
         Logger.log(
-          `[ClientDatabase][getOne] Client with email ${email} retrieved sucessfully`
+          `[ClientDatabase][getByEmail] Client with email ${email} retrieved successfully`
         );
 
         resolve(item as ClientCompleteDto);
@@ -82,7 +77,7 @@ export class ClientDatabase implements DatabaseService {
     return new Promise((resolve, reject) => {
       this.db.run(
         this.sql.insertClient,
-        [client.id, client.name, client.email, client.balance],
+        [client.id, client.name, client.email, client.balance, client.password],
         function (error) {
           if (error) {
             Logger.error(
@@ -105,7 +100,12 @@ export class ClientDatabase implements DatabaseService {
     return new Promise((resolve, reject) => {
       this.db.run(
         this.sql.updateClient,
-        [updateClient.name, updateClient.email, updateClient.id],
+        [
+          updateClient.name,
+          updateClient.email,
+          updateClient.password,
+          updateClient.id,
+        ],
         function (error) {
           if (error) {
             Logger.error(
@@ -124,34 +124,31 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async delete(client: DeleteClientDto): Promise<void> {
+  public async delete(client: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.db.run(this.sql.deleteClient, [client.id], function (error) {
+      this.db.run(this.sql.deleteClient, [client], function (error) {
         if (error) {
           Logger.error(
-            `[ClientDatabase][delete] Error while deleting the client ${client.id}`,
+            `[ClientDatabase][delete] Error while deleting the client ${client}`,
             error
           );
           return reject(error);
         }
 
         Logger.log(
-          `[ClientDatabase][delete] Client ${client.id} deleted successfully`
+          `[ClientDatabase][delete] Client ${client} deleted successfully`
         );
         resolve();
       });
     });
   }
 
-  public async deposit(
-    clientId: GetClientByIdDto,
-    value: TransactionDto
-  ): Promise<void> {
+  public async deposit(clientId: string, value: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(this.sql.deposit, [value, clientId], function (error) {
         if (error) {
           Logger.error(
-            `[ClientDatabase][deposit] Error while depositing: `,
+            `[ClientDatabase][deposit] Error while depositing`,
             error
           );
           return reject(error);
@@ -163,10 +160,7 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 
-  public async withdraw(
-    clientId: GetClientByIdDto,
-    value: TransactionDto
-  ): Promise<void> {
+  public async withdraw(clientId: string, value: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(this.sql.withdraw, [value, clientId], function (error) {
         if (error) {
@@ -185,11 +179,3 @@ export class ClientDatabase implements DatabaseService {
     });
   }
 }
-
-//Usa configService disponibilizado no nest.js, para consumir configurações das variáveis de ambeinte
-//Evita configuração hardcoded
-//Serve a abstração do database service, encapsulamento
-//Responsabilidade única de atender ao Service de Database (solid)
-//Trata comportamentos e exceções individulamente, try/catch em cada método, facilitar debugging e análise de logs em caso de erro
-//Chama serviço responsável pela camada de comunicação com banco de dados
-//abordagem diferente pois o sqlite não suporta a forma do axios

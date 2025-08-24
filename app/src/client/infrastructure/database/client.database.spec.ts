@@ -23,7 +23,7 @@ describe('ClientDatabase', () => {
         run: jest.fn(),
       }),
       getSql: jest.fn().mockReturnValue({
-        insertClient: `INSERT INTO clients(name, email, balance, password) VALUES(?, ?, ?, ?)`,
+        insertClient: `INSERT INTO clients(id, name, email, balance, password) VALUES(?, ?, ?, ?, ?)`,
         selectAllClients: `SELECT * FROM clients`,
         selectClientById: `SELECT * FROM clients WHERE id = ?`,
         selectByEmail: `SELECT * FROM clients WHERE email = ?`,
@@ -164,7 +164,7 @@ describe('ClientDatabase', () => {
     //Act and Assert
     await expect(clientDatabase.create(client)).resolves.toBeUndefined();
     expect(mockRun).toHaveBeenCalledWith(
-      'INSERT INTO clients(name, email, balance, password) VALUES(?, ?, ?, ?)',
+      'INSERT INTO clients(id, name, email, balance, password) VALUES(?, ?, ?, ?, ?)',
       [client.id, client.name, client.email, client.balance],
       expect.any(Function)
     );

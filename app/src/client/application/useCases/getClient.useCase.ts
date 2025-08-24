@@ -3,7 +3,13 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { ClientCompleteDto, GetClientByIdDto } from '../../domain/client.model';
+import { isUUID } from 'class-validator';
+import {
+  Adapter,
+  ClientCompleteDto,
+  ClientResult,
+  GetClientByIdDto,
+} from '../../domain/client.model';
 import { ClientManagerService } from '../services/clientManager.service';
 
 @Injectable()
@@ -12,23 +18,55 @@ export class GetClientUseCase {
 
   public async execute(
     clientId?: GetClientByIdDto
-  ): Promise<ClientCompleteDto | ClientCompleteDto[]> {
+  ): Promise<ClientResult | ClientResult[]> {
     try {
       Logger.debug('[GetClientUseCase][execute] Starting...');
+
+      if (clientId) await this.checkType(clientId);
 
       const result = clientId
         ? await this.clientService.findOne(clientId)
         : await this.clientService.findAll();
 
-      Logger.log('[GetClientUseCase][execute] Success', result);
-      return result;
+      const adapted = await this.adaptResult(result);
+      Logger.log('[GetClientUseCase][execute] Success', adapted);
+
+      return adapted;
     } catch (error) {
+      if (error instanceof Error) {
+        Logger.error(`Client ${clientId.id} not found`);
+      }
+
       Logger.error(
         '[GetClientUseCase][execute] Error while getting client:',
         error
       );
       throw new InternalServerErrorException(error);
     }
+  }
+
+  private async checkType(clientId: GetClientByIdDto): Promise<boolean> {
+    if (isUUID(clientId.id)) {
+      return;
+    }
+
+    throw new Error(
+      `[GetClientUseCase][execute] ${clientId.id} is not a valid UUID`
+    );
+  }
+
+  private async adaptResult(
+    result: ClientCompleteDto | ClientCompleteDto[]
+  ): Promise<ClientResult[]> {
+    let adaptedResult;
+
+    Array.isArray(result)
+      ? (adaptedResult = result.map((item: ClientCompleteDto) =>
+          Adapter.adapter(item)
+        ))
+      : (adaptedResult = Adapter.adapter(result));
+
+    return adaptedResult;
   }
 }
 
