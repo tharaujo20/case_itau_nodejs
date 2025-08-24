@@ -6,11 +6,8 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
-import { SecurityDto, TransactionDto } from 'src/client/domain/account.model';
-import {
-  ClientCompleteDto,
-  GetClientByIdDto,
-} from 'src/client/domain/client.model';
+import { SafeWithdrawDto } from '../../domain/account.model';
+import { ClientCompleteDto, GetClientByIdDto } from '../../domain/client.model';
 import { AccountManagerService } from '../services/accountManager.service';
 import { ClientManagerService } from '../services/clientManager.service';
 import { WithdrawValueUseCase } from './withdrawValue.useCase';
@@ -55,10 +52,8 @@ describe('WithdrawValueUseCase', () => {
   it('should withdraw value if client exists and match password', async () => {
     // Arrange
     const clientId: GetClientByIdDto = { id: chance.guid() };
-    const amount: TransactionDto = {
+    const withdraw: SafeWithdrawDto = {
       amount: chance.floating({ min: 1, max: 200 }),
-    };
-    const password: SecurityDto = {
       password: chance.integer({ min: 1000, max: 9999 }),
     };
     const existentClient: ClientCompleteDto = {
@@ -66,9 +61,9 @@ describe('WithdrawValueUseCase', () => {
       name: chance.name(),
       email: chance.email(),
       balance: chance.floating({ min: 100, max: 1000 }),
-      password: password.password,
+      password: withdraw.password,
     };
-    const balance = existentClient.balance - amount.amount;
+    const balance = existentClient.balance - withdraw.amount;
 
     jest.spyOn(accountService, 'withdraw').mockResolvedValue(balance);
     jest.spyOn(clientService, 'findOne').mockResolvedValue(existentClient);
@@ -76,15 +71,11 @@ describe('WithdrawValueUseCase', () => {
     jest.spyOn(Logger, 'log').mockImplementation();
 
     // Act
-    const result = await withdrawValueUseCase.execute(
-      clientId,
-      amount,
-      password
-    );
+    const result = await withdrawValueUseCase.execute(clientId, withdraw);
 
     // Assert
     expect(clientService.findOne).toHaveBeenCalledWith(clientId);
-    expect(accountService.withdraw).toHaveBeenCalledWith(clientId, amount);
+    expect(accountService.withdraw).toHaveBeenCalledWith(clientId, withdraw);
     expect(result).toBe(balance);
     expect(balance).toBeLessThan(existentClient.balance);
     expect(Logger.debug).toHaveBeenCalled();
@@ -92,12 +83,10 @@ describe('WithdrawValueUseCase', () => {
   });
 
   it('should throw BadRequestException if client does not exist', async () => {
-    // Arrange
+    //Arrange
     const clientId: GetClientByIdDto = { id: chance.guid() };
-    const amount: TransactionDto = {
-      amount: chance.floating({ min: 1, max: 1000 }),
-    };
-    const password: SecurityDto = {
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
       password: chance.integer({ min: 1000, max: 9999 }),
     };
 
@@ -107,24 +96,20 @@ describe('WithdrawValueUseCase', () => {
     jest.spyOn(Logger, 'error').mockImplementation();
 
     try {
-      // Act
-      const result = await withdrawValueUseCase.execute(
-        clientId,
-        amount,
-        password
-      );
+      //Act
+      const result = await withdrawValueUseCase.execute(clientId, withdraw);
     } catch (error) {
       //Assert
-      expect(
-        withdrawValueUseCase.execute(clientId, amount, password)
-      ).rejects.toThrow(BadRequestException);
+      expect(withdrawValueUseCase.execute(clientId, withdraw)).rejects.toThrow(
+        BadRequestException
+      );
       expect(Logger.debug).toHaveBeenCalled();
       expect(Logger.error).toHaveBeenCalled();
     }
   });
 
   it('should throw UnauthorizedException if password does not match', async () => {
-    // Arrange
+    //Arrange
     const clientId: GetClientByIdDto = { id: chance.guid() };
     const existentClient: ClientCompleteDto = {
       id: clientId.id,
@@ -133,10 +118,8 @@ describe('WithdrawValueUseCase', () => {
       balance: chance.floating({ min: 100, max: 1000 }),
       password: chance.integer({ min: 1000, max: 9999 }),
     };
-    const amount: TransactionDto = {
-      amount: chance.floating({ min: 1, max: 1000 }),
-    };
-    const password: SecurityDto = {
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
       password: chance.integer({ min: 1000, max: 9999 }),
     };
 
@@ -146,17 +129,13 @@ describe('WithdrawValueUseCase', () => {
     jest.spyOn(Logger, 'error').mockImplementation();
 
     try {
-      // Act
-      const result = await withdrawValueUseCase.execute(
-        clientId,
-        amount,
-        password
-      );
+      //Act
+      const result = await withdrawValueUseCase.execute(clientId, withdraw);
     } catch (error) {
       //Assert
-      expect(
-        withdrawValueUseCase.execute(clientId, amount, password)
-      ).rejects.toThrow(UnauthorizedException);
+      expect(withdrawValueUseCase.execute(clientId, withdraw)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(Logger.debug).toHaveBeenCalled();
       expect(Logger.error).toHaveBeenCalled();
     }
@@ -165,10 +144,8 @@ describe('WithdrawValueUseCase', () => {
   it('should log error and throw InternalServerErrorException on deposit error', async () => {
     //Arrange
     const clientId: GetClientByIdDto = { id: chance.guid() };
-    const amount: TransactionDto = {
-      amount: chance.floating({ min: 1, max: 1000 }),
-    };
-    const password: SecurityDto = {
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
       password: chance.integer({ min: 1000, max: 9999 }),
     };
     const rejectedError = 'unknown error';
@@ -180,16 +157,12 @@ describe('WithdrawValueUseCase', () => {
 
     try {
       //Act
-      const result = await withdrawValueUseCase.execute(
-        clientId,
-        amount,
-        password
-      );
+      const result = await withdrawValueUseCase.execute(clientId, withdraw);
     } catch (error) {
       //Assert
-      expect(
-        withdrawValueUseCase.execute(clientId, amount, password)
-      ).rejects.toThrow(InternalServerErrorException);
+      expect(withdrawValueUseCase.execute(clientId, withdraw)).rejects.toThrow(
+        InternalServerErrorException
+      );
       expect(Logger.debug).toHaveBeenCalled();
       expect(Logger.error).toHaveBeenCalled();
     }

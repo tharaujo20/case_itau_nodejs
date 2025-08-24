@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
-import { TransactionDto } from 'src/client/domain/account.model';
+import { SafeWithdrawDto, TransactionDto } from '../../domain/account.model';
 import {
   ClientCompleteDto,
   DeleteClientDto,
@@ -88,13 +88,13 @@ describe('ClientDatabase', () => {
     });
 
     //Act
-    const result = await clientDatabase.getOne(clientId);
+    const result = await clientDatabase.getOne(clientId.id);
 
     //Assert
     expect(result).toEqual({ id: id, name: 'Cliente Mockado' });
     expect(mockGet).toHaveBeenCalledWith(
       'SELECT * FROM clients WHERE id = ?',
-      [clientId],
+      [clientId.id],
       expect.any(Function)
     );
   });
@@ -109,7 +109,7 @@ describe('ClientDatabase', () => {
     });
 
     //Act and Assert
-    await expect(clientDatabase.getOne(clientId)).rejects.toThrow(
+    await expect(clientDatabase.getOne(clientId.id)).rejects.toThrow(
       'Database error'
     );
   });
@@ -165,7 +165,7 @@ describe('ClientDatabase', () => {
     await expect(clientDatabase.create(client)).resolves.toBeUndefined();
     expect(mockRun).toHaveBeenCalledWith(
       'INSERT INTO clients(id, name, email, balance, password) VALUES(?, ?, ?, ?, ?)',
-      [client.id, client.name, client.email, client.balance],
+      [client.id, client.name, client.email, client.balance, client.password],
       expect.any(Function)
     );
   });
@@ -206,7 +206,12 @@ describe('ClientDatabase', () => {
     await expect(clientDatabase.update(updateClient)).resolves.toBeUndefined();
     expect(mockRun).toHaveBeenCalledWith(
       'UPDATE clients SET name = ?, email = ?, password = ? WHERE id = ?',
-      [updateClient.name, updateClient.email, updateClient.id],
+      [
+        updateClient.name,
+        updateClient.email,
+        updateClient.password,
+        updateClient.id,
+      ],
       expect.any(Function)
     );
   });
@@ -238,7 +243,9 @@ describe('ClientDatabase', () => {
     mockRun.mockImplementation((sql, params, callback) => callback(null));
 
     //Act and Assert
-    await expect(clientDatabase.delete(deleteClient)).resolves.toBeUndefined();
+    await expect(
+      clientDatabase.delete(deleteClient.id)
+    ).resolves.toBeUndefined();
     expect(mockRun).toHaveBeenCalledWith(
       'DELETE FROM clients WHERE id = ?',
       [deleteClient.id],
@@ -256,7 +263,7 @@ describe('ClientDatabase', () => {
     );
 
     //Act and Assert
-    await expect(clientDatabase.delete(deleteClient)).rejects.toThrow(
+    await expect(clientDatabase.delete(deleteClient.id)).rejects.toThrow(
       'Database error'
     );
   });
@@ -266,16 +273,19 @@ describe('ClientDatabase', () => {
     const mockRun = initDbMock.getDatabase()?.run as jest.Mock;
     const id = chance.guid();
     const clientId: GetClientByIdDto = { id: id };
-    const value: TransactionDto = { amount: 50 };
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     mockRun.mockImplementation((sql, params, callback) => callback(null));
 
     //Act and Assert
     await expect(
-      clientDatabase.deposit(clientId, value)
+      clientDatabase.deposit(clientId.id, withdraw.amount)
     ).resolves.toBeUndefined();
     expect(mockRun).toHaveBeenCalledWith(
       'UPDATE clients SET balance = balance + ? WHERE id = ?',
-      [value, clientId],
+      [withdraw.amount, clientId.id],
       expect.any(Function)
     );
   });
@@ -291,9 +301,9 @@ describe('ClientDatabase', () => {
     );
 
     //Act and Assert
-    await expect(clientDatabase.deposit(clientId, value)).rejects.toThrow(
-      'Database error'
-    );
+    await expect(
+      clientDatabase.deposit(clientId.id, value.amount)
+    ).rejects.toThrow('Database error');
   });
 
   it('should withdraw from a client', async () => {
@@ -301,16 +311,19 @@ describe('ClientDatabase', () => {
     const mockRun = initDbMock.getDatabase()?.run as jest.Mock;
     const id = chance.guid();
     const clientId: GetClientByIdDto = { id: id };
-    const value: TransactionDto = { amount: 50 };
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     mockRun.mockImplementation((sql, params, callback) => callback(null));
 
     //Act and Assert
     await expect(
-      clientDatabase.withdraw(clientId, value)
+      clientDatabase.withdraw(clientId.id, withdraw.amount)
     ).resolves.toBeUndefined();
     expect(mockRun).toHaveBeenCalledWith(
       'UPDATE clients SET balance = balance - ? WHERE id = ?',
-      [value, clientId],
+      [withdraw.amount, clientId.id],
       expect.any(Function)
     );
   });
@@ -320,14 +333,17 @@ describe('ClientDatabase', () => {
     const id = chance.guid();
     const mockRun = initDbMock.getDatabase()?.run as jest.Mock;
     const clientId: GetClientByIdDto = { id: id };
-    const value: TransactionDto = { amount: 50 };
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     mockRun.mockImplementation((sql, params, callback) =>
       callback(new Error('Database error'))
     );
 
     //Act and Assert
-    await expect(clientDatabase.withdraw(clientId, value)).rejects.toThrow(
-      'Database error'
-    );
+    await expect(
+      clientDatabase.withdraw(clientId.id, withdraw.amount)
+    ).rejects.toThrow('Database error');
   });
 });

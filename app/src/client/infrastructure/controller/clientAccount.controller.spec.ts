@@ -2,19 +2,19 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
 import {
-  ClientCompleteDto,
+  ClientResult,
   CreateClientDto,
   DeleteClientDto,
   GetClientByIdDto,
   UpdateClientDto,
-} from 'src/client/domain/client.model';
+} from '../../domain/client.model';
 import { DeleteClientUseCase } from '../../application/useCases/deleteClient.useCase';
 import { DepositValueUseCase } from '../../application/useCases/depositValue.useCase';
 import { GetClientUseCase } from '../../application/useCases/getClient.useCase';
 import { PostClientUseCase } from '../../application/useCases/postClient.useCase';
 import { UpdateClientUseCase } from '../../application/useCases/updateClient.useCase';
 import { WithdrawValueUseCase } from '../../application/useCases/withdrawValue.useCase';
-import { SecurityDto, TransactionDto } from '../../domain/account.model';
+import { SafeWithdrawDto, TransactionDto } from '../../domain/account.model';
 import { ClientAccountController } from '../controller/clientAccount.controller';
 
 describe('ClientAccountController', () => {
@@ -67,20 +67,18 @@ describe('ClientAccountController', () => {
 
   it('should get all clients', async () => {
     // Arrange
-    const result: ClientCompleteDto[] = [
+    const result: ClientResult[] = [
       {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
         balance: chance.floating({ min: 1, max: 1000 }),
-        password: chance.integer({ min: 1000, max: 9999 }),
       },
       {
         id: chance.guid(),
         name: chance.name(),
         email: chance.email(),
         balance: chance.floating({ min: 1, max: 1000 }),
-        password: chance.integer({ min: 1000, max: 9999 }),
       },
     ];
 
@@ -99,12 +97,11 @@ describe('ClientAccountController', () => {
   it('should get client by id', async () => {
     // Arrange
     const id = chance.guid();
-    const result: ClientCompleteDto = {
+    const result: ClientResult = {
       id: chance.guid(),
       name: chance.name(),
       email: chance.email(),
       balance: chance.floating({ min: 1, max: 1000 }),
-      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     jest.spyOn(getClientUseCase, 'execute').mockResolvedValue(result);
@@ -144,6 +141,7 @@ describe('ClientAccountController', () => {
       id: chance.guid(),
       name: chance.name(),
       email: chance.email(),
+      password: chance.integer({ min: 1000, max: 9999 }),
     };
 
     jest.spyOn(updateClientUseCase, 'execute').mockResolvedValue(undefined);
@@ -195,26 +193,20 @@ describe('ClientAccountController', () => {
   it('should withdraw money', async () => {
     // Arrange
     const id: GetClientByIdDto = chance.guid();
-    const amount: TransactionDto = {
+    const withdraw: SafeWithdrawDto = {
       amount: chance.floating({ min: 1, max: 1000 }),
-    };
-    const result: number = chance.floating({ min: 1, max: 1000 });
-    const password: SecurityDto = {
       password: chance.integer({ min: 1000, max: 9999 }),
     };
+    const result: number = chance.floating({ min: 1, max: 1000 });
 
     jest.spyOn(withdrawValueUseCase, 'execute').mockResolvedValue(result);
     jest.spyOn(Logger, 'debug').mockImplementation();
 
     // Act
-    const response = await controller.withdrawMoney(id, amount, password);
+    const response = await controller.withdrawMoney(id, withdraw);
 
     // Assert
-    expect(withdrawValueUseCase.execute).toHaveBeenCalledWith(
-      id,
-      amount,
-      password
-    );
+    expect(withdrawValueUseCase.execute).toHaveBeenCalledWith(id, withdraw);
     expect(response).toBe(result);
     expect(Logger.debug).toHaveBeenCalled();
   });

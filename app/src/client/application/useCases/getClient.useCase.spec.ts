@@ -3,8 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
 import {
   ClientCompleteDto,
+  ClientResult,
   GetClientByIdDto,
-} from 'src/client/domain/client.model';
+} from '../../domain/client.model';
 import { ClientManagerService } from '../services/clientManager.service';
 import { GetClientUseCase } from './getClient.useCase';
 
@@ -47,6 +48,14 @@ describe('GetClientUseCase', () => {
       balance: chance.floating({ min: 100, max: 1000 }),
       password: chance.integer({ min: 1000, max: 9999 }),
     };
+
+    const clientResult: ClientResult = {
+      id: clientId.id,
+      name: existentClient.name,
+      email: existentClient.email,
+      balance: existentClient.balance,
+    };
+
     jest.spyOn(clientService, 'findOne').mockResolvedValue(existentClient);
     jest.spyOn(Logger, 'debug').mockImplementation();
     jest.spyOn(Logger, 'log').mockImplementation();
@@ -56,7 +65,7 @@ describe('GetClientUseCase', () => {
 
     // Assert
     expect(clientService.findOne).toHaveBeenCalledWith(clientId);
-    expect(response).toBe(existentClient);
+    expect(response).toEqual(clientResult);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
   });
@@ -87,6 +96,27 @@ describe('GetClientUseCase', () => {
       },
     ];
 
+    const allResults: ClientResult[] = [
+      {
+        id: allClients[0].id,
+        name: allClients[0].name,
+        email: allClients[0].email,
+        balance: allClients[0].balance,
+      },
+      {
+        id: allClients[1].id,
+        name: allClients[1].name,
+        email: allClients[1].email,
+        balance: allClients[1].balance,
+      },
+      {
+        id: allClients[2].id,
+        name: allClients[2].name,
+        email: allClients[2].email,
+        balance: allClients[2].balance,
+      },
+    ];
+
     jest.spyOn(clientService, 'findAll').mockResolvedValue(allClients);
     jest.spyOn(Logger, 'debug').mockImplementation();
     jest.spyOn(Logger, 'log').mockImplementation();
@@ -96,7 +126,7 @@ describe('GetClientUseCase', () => {
 
     // Assert
     expect(clientService.findAll).toHaveBeenCalled();
-    expect(response).toBe(allClients);
+    expect(response).toEqual(allResults);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
   });
@@ -120,5 +150,15 @@ describe('GetClientUseCase', () => {
       );
       expect(Logger.error).toHaveBeenCalled();
     }
+  });
+
+  it('should validate if parameter is a valid uuid', async () => {
+    // Arrange
+    const clientId: GetClientByIdDto = { id: chance.string() };
+
+    // Act & Assert
+    await expect(getClientUseCase.execute(clientId)).rejects.toThrow(
+      `[GetClientUseCase][execute] ${clientId.id} is not a valid UUID`
+    );
   });
 });

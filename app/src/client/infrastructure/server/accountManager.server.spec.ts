@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
 import { AccountManagerService } from '../../application/services/accountManager.service';
 import { DatabaseService } from '../../application/services/database.service';
+import { SafeWithdrawDto, TransactionDto } from '../../domain/account.model';
 import { ClientCompleteDto, GetClientByIdDto } from '../../domain/client.model';
 import { AccountManagerServer } from './accountManager.server';
 
@@ -53,7 +54,9 @@ describe('AccountManagerServer', () => {
     const id = chance.guid();
     const clientId: GetClientByIdDto = { id: id };
     const oldBalance = chance.floating({ min: 1, max: 1000 });
-    const deposit = chance.floating({ min: 1, max: 1000 });
+    const deposit: TransactionDto = {
+      amount: chance.floating({ min: 1, max: 1000 }),
+    };
     const completeClient: ClientCompleteDto = {
       id: id,
       name: chance.name(),
@@ -71,8 +74,11 @@ describe('AccountManagerServer', () => {
     const result = await accountManagerServer.deposit(clientId, deposit);
 
     // Assert
-    expect(databaseService.deposit).toHaveBeenCalledWith(clientId, deposit);
-    expect(databaseService.getOne).toHaveBeenCalledWith(clientId);
+    expect(databaseService.deposit).toHaveBeenCalledWith(
+      clientId.id,
+      deposit.amount
+    );
+    expect(databaseService.getOne).toHaveBeenCalledWith(clientId.id);
     expect(result).toBe(completeClient.balance);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
@@ -102,12 +108,15 @@ describe('AccountManagerServer', () => {
     const id = chance.guid();
     const clientId: GetClientByIdDto = { id: id };
     const oldBalance = chance.floating({ min: 1, max: 1000 });
-    const withdraw = chance.floating({ min: 1, max: 1000 });
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     const completeClient: ClientCompleteDto = {
       id: id,
       name: chance.name(),
       email: chance.email(),
-      balance: oldBalance - withdraw,
+      balance: oldBalance - withdraw.amount,
       password: chance.integer({ min: 1000, max: 9999 }),
     };
 
@@ -120,8 +129,11 @@ describe('AccountManagerServer', () => {
     const result = await accountManagerServer.withdraw(clientId, withdraw);
 
     // Assert
-    expect(databaseService.withdraw).toHaveBeenCalledWith(clientId, withdraw);
-    expect(databaseService.getOne).toHaveBeenCalledWith(clientId);
+    expect(databaseService.withdraw).toHaveBeenCalledWith(
+      clientId.id,
+      withdraw.amount
+    );
+    expect(databaseService.getOne).toHaveBeenCalledWith(clientId.id);
     expect(result).toBe(completeClient.balance);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
@@ -130,7 +142,10 @@ describe('AccountManagerServer', () => {
   it('should log error and throw on withdraw error', async () => {
     // Arrange
     const clientId = chance.guid();
-    const amount = { amount: chance.floating({ min: 1, max: 1000 }) };
+    const withdraw: SafeWithdrawDto = {
+      amount: chance.floating({ min: 1, max: 200 }),
+      password: chance.integer({ min: 1000, max: 9999 }),
+    };
     const error = new Error('fail');
     jest.spyOn(databaseService, 'withdraw').mockRejectedValue(error);
     jest.spyOn(Logger, 'debug').mockImplementation();
@@ -138,10 +153,12 @@ describe('AccountManagerServer', () => {
 
     try {
       // Act
-      await accountManagerServer.withdraw(clientId, amount);
+      await accountManagerServer.withdraw(clientId, withdraw);
     } catch (error) {
       //Assert
-      expect(accountManagerServer.withdraw(clientId, amount)).rejects.toThrow();
+      expect(
+        accountManagerServer.withdraw(clientId, withdraw)
+      ).rejects.toThrow();
       expect(Logger.error).toHaveBeenCalled();
     }
   });

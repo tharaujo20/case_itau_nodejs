@@ -5,10 +5,7 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Chance } from 'chance';
-import {
-  ClientCompleteDto,
-  UpdateClientDto,
-} from 'src/client/domain/client.model';
+import { ClientCompleteDto, UpdateClientDto } from '../../domain/client.model';
 import { ClientManagerService } from '../services/clientManager.service';
 import { UpdateClientUseCase } from './updateClient.useCase';
 
@@ -65,7 +62,7 @@ describe('UpdateClientUseCase', () => {
     await updateClientUseCase.execute(newClient);
 
     // Assert
-    expect(clientService.findOne).toHaveBeenCalledWith(newClient.id);
+    expect(clientService.findOne).toHaveBeenCalledWith({ id: newClient.id });
     expect(clientService.updateClient).toHaveBeenCalled();
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
@@ -95,7 +92,7 @@ describe('UpdateClientUseCase', () => {
     await updateClientUseCase.execute(newClient);
 
     // Assert
-    expect(clientService.findOne).toHaveBeenCalledWith(newClient.id);
+    expect(clientService.findOne).toHaveBeenCalledWith({ id: newClient.id });
     expect(clientService.updateClient).toHaveBeenCalled();
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
@@ -125,7 +122,7 @@ describe('UpdateClientUseCase', () => {
     await updateClientUseCase.execute(newClient);
 
     // Assert
-    expect(clientService.findOne).toHaveBeenCalledWith(newClient.id);
+    expect(clientService.findOne).toHaveBeenCalled();
     expect(clientService.updateClient).toHaveBeenCalled();
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();

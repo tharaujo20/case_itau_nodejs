@@ -122,7 +122,7 @@ describe('ClientManagerServer', () => {
     const result = await clientManagerServer.findOne(id);
 
     // Assert
-    expect(databaseService.getOne).toHaveBeenCalledWith(id);
+    expect(databaseService.getOne).toHaveBeenCalledWith(id.id);
     expect(result).toBe(client);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
@@ -133,6 +133,21 @@ describe('ClientManagerServer', () => {
     const id: GetClientByIdDto = { id: chance.guid() };
     const error = new Error('fail');
     jest.spyOn(databaseService, 'getOne').mockRejectedValue(error);
+    jest.spyOn(Logger, 'error').mockImplementation();
+
+    // Act & Assert
+    try {
+      await clientManagerServer.findOne(id);
+    } catch (error) {
+      await expect(clientManagerServer.findOne(id)).rejects.toThrow();
+      expect(Logger.error).toHaveBeenCalled();
+    }
+  });
+
+  it('should log error if client would not found', async () => {
+    // Arrange
+    const id: GetClientByIdDto = { id: chance.guid() };
+    jest.spyOn(databaseService, 'getOne').mockResolvedValue(undefined);
     jest.spyOn(Logger, 'error').mockImplementation();
 
     // Act & Assert
@@ -286,7 +301,7 @@ describe('ClientManagerServer', () => {
     const result = await clientManagerServer.deleteClient(delClient);
 
     // Assert
-    expect(databaseService.delete).toHaveBeenCalledWith(delClient);
+    expect(databaseService.delete).toHaveBeenCalledWith(delClient.id);
     expect(result).toBe(undefined);
     expect(Logger.debug).toHaveBeenCalled();
     expect(Logger.log).toHaveBeenCalled();
