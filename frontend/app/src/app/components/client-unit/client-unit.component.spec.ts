@@ -30,6 +30,20 @@ describe('ClientUnitComponent', () => {
     component = fixture.componentInstance;
   });
 
+  it('should create component', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('deve mostrar erro se id não for fornecido', () => {
+    component.id = '';
+    component.getClientById();
+
+    expect(component.errorMessage).toBe('ID do cliente não foi fornecido.');
+    expect(component.client).toBeNull();
+    expect(component.loading).toBeFalse();
+    expect(component.message).toBeNull();
+  });
+
   it('deve carregar um cliente pelo id', () => {
     const client: Client = {
       id: '1',
@@ -37,22 +51,30 @@ describe('ClientUnitComponent', () => {
       email: 'carlos@test.com',
       balance: 500,
     };
+    component.id = '1';
     mockClientService.getClientById.and.returnValue(of(client));
 
-    fixture.detectChanges();
+    component.getClientById();
 
+    expect(mockClientService.getClientById).toHaveBeenCalledWith('1');
     expect(component.client).toEqual(client);
     expect(component.errorMessage).toBeNull();
+    expect(component.loading).toBeFalse();
+    expect(component.message).toBe('Cliente encontrado');
   });
 
   it('deve tratar erro ao buscar cliente', () => {
+    component.id = '1';
     mockClientService.getClientById.and.returnValue(
       throwError(() => new Error('Erro'))
     );
 
-    fixture.detectChanges();
+    component.getClientById();
 
+    expect(mockClientService.getClientById).toHaveBeenCalledWith('1');
     expect(component.client).toBeNull();
     expect(component.errorMessage).toBe('Erro ao buscar cliente.');
+    expect(component.loading).toBeFalse();
+    expect(component.message).toBeNull();
   });
 });

@@ -48,4 +48,23 @@ describe('ClientListComponent', () => {
       'Erro ao carregar a lista de clientes.'
     );
   });
+  it('deve lidar quando getAllClients retornar algo que não é array', () => {
+    const clientLikeObject: any = {
+      id: '1',
+      name: 'Maria',
+      email: 'maria@test.com',
+      balance: 100,
+    };
+
+    // Simula o retorno "não array" mesmo que seja compatível com Client[]
+    mockClientService.getAllClients.and.returnValue(
+      of(clientLikeObject as any)
+    );
+
+    fixture.detectChanges();
+
+    expect(component.clients.length).toBe(1); // colocado dentro de um array pelo ternário
+    expect(component.clients[0]).toEqual(clientLikeObject);
+    expect(component.errorMessage).toBeNull();
+  });
 });

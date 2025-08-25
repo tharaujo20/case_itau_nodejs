@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core'; //OnInit
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-//import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { Client } from '../../model/client.model';
 import { ClientService } from '../../services/client.service';
@@ -14,21 +13,15 @@ import { ClientService } from '../../services/client.service';
   styleUrls: ['./client-unit.component.scss'],
 })
 export class ClientUnitComponent {
-  //implements OnInit
   id: string = '';
   client: Client | null = null;
   errorMessage: string | null = null;
   loading: boolean = false;
   message: string | null = null;
 
-  constructor(private clientService: ClientService, private route: Router) {} // ActivatedRoute
-
-  // ngOnInit(): void {
-  //   this.getClientById();
-  // }
+  constructor(private clientService: ClientService, private route: Router) {}
 
   getClientById(): void {
-    //const id = this.route.snapshot.paramMap.get('id');
     if (!this.id) {
       this.errorMessage = 'ID do cliente não foi fornecido.';
       return;

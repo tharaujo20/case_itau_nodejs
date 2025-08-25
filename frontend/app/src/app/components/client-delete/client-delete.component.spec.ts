@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { ClientDeleteComponent } from './client-delete.component';
 import { ClientService } from '../../services/client.service';
 import { Router } from '@angular/router';
@@ -27,30 +32,51 @@ describe('ClientDeleteComponent', () => {
     fixture.detectChanges();
   });
 
-  it('deve mostrar erro se id não for informado', () => {
+  it('should create component', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should show error if id is missing', () => {
     component.id = '';
     component.deleteClient();
     expect(component.errorMessage).toBe('O ID do cliente é obrigatório.');
+    expect(component.loading).toBeFalse();
   });
 
-  it('deve excluir cliente com sucesso', () => {
+  it('should delete client successfully and navigate after 2 seconds', fakeAsync(() => {
     component.id = 'uuid-123';
     mockClientService.deleteClient.and.returnValue(of(void 0));
 
     component.deleteClient();
+    expect(component.loading).toBeTrue();
 
-    expect(mockClientService.deleteClient).toHaveBeenCalledWith('uuid-123');
+    // Avança o subscribe.next
+    tick();
+    fixture.detectChanges();
+
     expect(component.message).toBe('Cliente excluído com sucesso!');
-  });
+    expect(component.errorMessage).toBeNull();
+    expect(component.loading).toBeFalse();
 
-  it('deve mostrar erro ao falhar exclusão', () => {
+    // Avança o setTimeout de 2s para navegar
+    tick(2000);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/clientes']);
+  }));
+
+  it('should handle error on client deletion', fakeAsync(() => {
     component.id = 'uuid-123';
     mockClientService.deleteClient.and.returnValue(
       throwError(() => new Error('Erro'))
     );
 
     component.deleteClient();
+    expect(component.loading).toBeTrue();
+
+    // Avança o subscribe.error
+    tick();
+    fixture.detectChanges();
 
     expect(component.errorMessage).toBe('Erro ao excluir cliente.');
-  });
+    expect(component.loading).toBeFalse();
+  }));
 });

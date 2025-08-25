@@ -47,10 +47,11 @@ describe('ClientWithdrawComponent', () => {
 
     component.withdraw();
 
-    expect(mockClientService.withdraw).toHaveBeenCalledWith('uuid-123', {
-      amount: 100,
-      password: 1234,
-    });
+    expect(mockClientService.withdraw).toHaveBeenCalledWith(
+      'uuid-123',
+      component.amount,
+      component.password
+    );
     expect(component.message).toBe('Saque realizado com sucesso!');
     expect(component.newBalance).toBe(400);
   });

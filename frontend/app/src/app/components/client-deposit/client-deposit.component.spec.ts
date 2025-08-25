@@ -37,9 +37,10 @@ describe('ClientDepositComponent', () => {
 
     component.deposit();
 
-    expect(mockClientService.deposit).toHaveBeenCalledWith('uuid-123', {
-      amount: 100,
-    });
+    expect(mockClientService.deposit).toHaveBeenCalledWith(
+      'uuid-123',
+      component.amount
+    );
     expect(component.message).toBe('Depósito realizado com sucesso!');
     expect(component.newBalance).toBe(500);
   });
