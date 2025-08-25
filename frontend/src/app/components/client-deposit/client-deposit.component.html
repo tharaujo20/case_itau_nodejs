@@ -1,0 +1,31 @@
+<h2>Depósito em Conta</h2>
+
+<form (ngSubmit)="deposit()" #form="ngForm" class="client-form">
+  <label for="id">ID (UUID):</label>
+  <input type="text" id="id" [(ngModel)]="id" name="id" required />
+
+  <label for="amount">Valor do Depósito:</label>
+  <input
+    type="number"
+    id="amount"
+    [(ngModel)]="amount"
+    name="amount"
+    required
+    min="1"
+  />
+
+  <button type="submit" [disabled]="loading">Depositar</button>
+</form>
+
+<div *ngIf="loading">Processando depósito...</div>
+
+<div *ngIf="message" class="success">
+  {{ message }}
+  <div *ngIf="newBalance !== null">
+    Saldo atualizado: <strong>{{ newBalance | currency:'BRL' }}</strong>
+  </div>
+</div>
+
+<div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
+</div>

@@ -1,0 +1,40 @@
+<!-- <h2>Detalhes do Cliente</h2>
+
+<div *ngIf="loading">Carregando cliente...</div>
+
+<div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="client && !loading">
+  <p><strong>ID:</strong> {{ client.id }}</p>
+  <p><strong>Nome:</strong> {{ client.name }}</p>
+  <p><strong>Email:</strong> {{ client.email }}</p>
+  <p><strong>Saldo:</strong> {{ client.balance | currency:'BRL' }}</p>
+</div> -->
+
+<h2>Buscar um Cliente</h2>
+
+<form (ngSubmit)="getClientById()" #form="ngForm" class="client-form">
+  <label for="id">ID (UUID):</label>
+  <input type="text" id="id" [(ngModel)]="id" name="id" required />
+
+  <button type="submit" [disabled]="loading">Buscar Cliente</button>
+</form>
+
+<div *ngIf="loading">Processando busca...</div>
+
+<div *ngIf="message" class="success">
+  {{ message }}
+</div>
+
+<div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="client && !loading">
+  <p><strong>ID:</strong> {{ client.id }}</p>
+  <p><strong>Nome:</strong> {{ client.name }}</p>
+  <p><strong>Email:</strong> {{ client.email }}</p>
+  <p><strong>Saldo:</strong> {{ client.balance | currency:'BRL' }}</p>
+</div>

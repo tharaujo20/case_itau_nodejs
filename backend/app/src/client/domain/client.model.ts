@@ -6,6 +6,8 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Max,
+  Min,
 } from 'class-validator';
 
 export class GetClientByIdDto {
@@ -27,7 +29,9 @@ export class CreateClientDto {
   @IsOptional()
   balance?: number;
 
-  @IsNumber()
+  @IsInt()
+  @Min(1000, { message: 'A senha deve ter 4 dígitos' })
+  @Max(9999, { message: 'A senha deve ter 4 dígitos' })
   @IsNotEmpty()
   password: number;
 }

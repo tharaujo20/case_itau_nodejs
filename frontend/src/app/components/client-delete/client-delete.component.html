@@ -1,0 +1,18 @@
+<h2>Excluir Cliente</h2>
+
+<form (ngSubmit)="deleteClient()" #form="ngForm" class="client-form">
+  <label for="id">ID (UUID):</label>
+  <input type="text" id="id" [(ngModel)]="id" name="id" required />
+
+  <button type="submit" [disabled]="loading">Excluir Cliente</button>
+</form>
+
+<div *ngIf="loading">Processando exclusão...</div>
+
+<div *ngIf="message" class="success">
+  {{ message }}
+</div>
+
+<div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
+</div>

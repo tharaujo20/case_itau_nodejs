@@ -128,7 +128,7 @@ describe('ClientAccountController', () => {
     jest.spyOn(Logger, 'debug').mockImplementation();
 
     // Act
-    await controller.postNewClient(client);
+    await controller.createClient(client);
 
     // Assert
     expect(postClientUseCase.execute).toHaveBeenCalledWith(client);
@@ -182,7 +182,7 @@ describe('ClientAccountController', () => {
     jest.spyOn(Logger, 'debug').mockImplementation();
 
     // Act
-    const response = await controller.depositMoney(id, amount);
+    const response = await controller.deposit(id, amount);
 
     // Assert
     expect(depositValueUseCase.execute).toHaveBeenCalledWith(id, amount);
@@ -203,7 +203,7 @@ describe('ClientAccountController', () => {
     jest.spyOn(Logger, 'debug').mockImplementation();
 
     // Act
-    const response = await controller.withdrawMoney(id, withdraw);
+    const response = await controller.withdraw(id, withdraw);
 
     // Assert
     expect(withdrawValueUseCase.execute).toHaveBeenCalledWith(id, withdraw);

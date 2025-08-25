@@ -1,0 +1,18 @@
+<h2>Lista de Clientes</h2>
+
+<div *ngIf="loading">Carregando clientes...</div>
+
+<div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
+</div>
+
+<ul *ngIf="clients.length > 0">
+  <li *ngFor="let client of clients">
+    {{ client.id }} <strong>{{ client.name }}</strong> {{ client.email }}
+    <span class="saldo">Saldo: {{ client.balance | currency:'BRL' }}</span>
+  </li>
+</ul>
+
+<div *ngIf="!loading && clients.length === 0 && !errorMessage">
+  Nenhum cliente encontrado.
+</div>

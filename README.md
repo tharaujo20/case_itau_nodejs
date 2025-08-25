@@ -1,6 +1,6 @@
 # Case de engenharia Itau - .NodeJS
 
-##READ.ME ATUALIZADO
+## READ.ME ATUALIZADO
 
 # Aplicação de Gestão de Clientes e Transações
 
@@ -17,10 +17,9 @@ Esta aplicação é um sistema simples de gerenciamento de clientes e suas trans
    ```bash
    npm run start
    ```
-   O servidor será iniciado na porta 8080.
-   ⚠️ Importante: Mantenha este terminal aberto, pois ele será o servidor da aplicação.
-
-Abra um segundo terminal para executar os comandos de teste via curl.
+   O servidor será iniciado na porta 8080.</br>
+   ⚠️ Importante: Mantenha este terminal aberto, pois ele será o servidor da aplicação.</br>
+   Abra um segundo terminal para executar os comandos de teste via curl.
 
 ## Testando as Rotas
 

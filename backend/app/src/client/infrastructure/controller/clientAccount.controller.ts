@@ -53,9 +53,9 @@ export class ClientAccountController {
   }
 
   @Post('/novo')
-  async postNewClient(@Body() client: CreateClientDto): Promise<void> {
+  async createClient(@Body() client: CreateClientDto): Promise<void> {
     Logger.debug(
-      '[ClientAccountController][postNewClient] Calling the use case...'
+      '[ClientAccountController][createClient] Calling the use case...'
     );
     await this.postClientUseCase.execute(client);
   }
@@ -77,24 +77,20 @@ export class ClientAccountController {
   }
 
   @Post(':id/depositar')
-  async depositMoney(
+  async deposit(
     @Param() id: GetClientByIdDto,
     @Body() amount: TransactionDto
   ): Promise<number> {
-    Logger.debug(
-      '[ClientAccountController][depositMoney] Calling the use case...'
-    );
+    Logger.debug('[ClientAccountController][deposit] Calling the use case...');
     return await this.depositValueUseCase.execute(id, amount);
   }
 
   @Post(':id/sacar')
-  async withdrawMoney(
+  async withdraw(
     @Param() id: GetClientByIdDto,
     @Body() withdrawData: SafeWithdrawDto
   ): Promise<number> {
-    Logger.debug(
-      '[ClientAccountController][withdrawMoney] Calling the use case...'
-    );
+    Logger.debug('[ClientAccountController][withdraw] Calling the use case...');
     return await this.withdrawValueUseCase.execute(id, withdrawData);
   }
 }
