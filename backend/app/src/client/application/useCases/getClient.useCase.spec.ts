@@ -161,4 +161,21 @@ describe('GetClientUseCase', () => {
       `[GetClientUseCase][execute] ${clientId.id} is not a valid UUID`
     );
   });
+
+  it('should log "Client not found" if error is instance of Error', async () => {
+    // Arrange
+    const clientId: GetClientByIdDto = { id: chance.guid() };
+    const error = new Error('fail');
+
+    jest.spyOn(clientService, 'findOne').mockRejectedValue(error);
+    jest.spyOn(Logger, 'debug').mockImplementation();
+    jest.spyOn(Logger, 'error').mockImplementation();
+
+    // Act & Assert
+    await expect(getClientUseCase.execute(clientId)).rejects.toThrow(Error);
+
+    expect(Logger.error).toHaveBeenCalledWith(
+      `Client ${clientId.id} not found`
+    );
+  });
 });
