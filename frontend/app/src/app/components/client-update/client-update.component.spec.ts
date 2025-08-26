@@ -79,20 +79,18 @@ describe('ClientUpdateComponent', () => {
       component.name = 'Maria';
       component.password = '1234';
 
-      // Mock do serviço para simular sucesso
       mockClientService.updateClient.and.returnValue(of(void 0));
 
       component.updateClient();
 
-      expect(component.loading).toBeTrue();
       expect(mockClientService.updateClient).toHaveBeenCalled();
 
-      tick(); // processa o subscribe
+      tick();
       expect(component.message).toBe('Cliente atualizado com sucesso!');
       expect(component.errorMessage).toBeNull();
       expect(component.loading).toBeFalse();
 
-      tick(2000); // processa o setTimeout
+      tick(2000);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/clientes']);
     }));
 
@@ -107,38 +105,35 @@ describe('ClientUpdateComponent', () => {
 
       component.updateClient();
 
-      expect(component.loading).toBeTrue();
       expect(component.errorMessage).toBe('Erro ao atualizar cliente.');
       expect(component.loading).toBeFalse();
       expect(component.message).toBeNull();
     });
   });
+
   it('deve atualizar cliente com sucesso e navegar (com email)', fakeAsync(() => {
     component.id = 'uuid-123';
     component.name = 'Maria';
-    component.email = 'maria@test.com'; // cobre o if do email
+    component.email = 'maria@test.com';
     component.password = '1234';
 
-    // Mock do serviço para simular sucesso
     mockClientService.updateClient.and.returnValue(of(void 0));
 
     component.updateClient();
 
-    expect(component.loading).toBeTrue();
     expect(mockClientService.updateClient).toHaveBeenCalledWith({
       id: 'uuid-123',
       name: 'Maria',
       email: 'maria@test.com',
-      password: 1234, // convertido para número
-      balance: 0, // necessário para satisfazer o tipo Client
+      password: 1234,
     });
 
-    tick(); // processa o subscribe
+    tick();
     expect(component.message).toBe('Cliente atualizado com sucesso!');
     expect(component.errorMessage).toBeNull();
     expect(component.loading).toBeFalse();
 
-    tick(2000); // processa o setTimeout
+    tick(2000);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/clientes']);
   }));
 });

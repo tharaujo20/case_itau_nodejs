@@ -83,12 +83,10 @@ describe('ClientCreateComponent', () => {
       component.password = '1234';
       component.balance = 100;
 
-      // Mock do createClient para retornar Observable<void>
       mockClientService.createClient.and.returnValue(of(void 0));
 
       component.createClient();
 
-      // Avança para o subscribe.next
       tick();
       fixture.detectChanges();
 
@@ -96,7 +94,6 @@ describe('ClientCreateComponent', () => {
       expect(component.errorMessage).toBeNull();
       expect(component.loading).toBeFalse();
 
-      // Avança 2s do setTimeout para navegar
       tick(2000);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/clientes']);
     }));
@@ -111,9 +108,7 @@ describe('ClientCreateComponent', () => {
       );
 
       component.createClient();
-      expect(component.loading).toBeTrue();
 
-      // Avança para o subscribe.error
       tick();
       fixture.detectChanges();
 

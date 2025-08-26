@@ -56,14 +56,13 @@ describe('ClientListComponent', () => {
       balance: 100,
     };
 
-    // Simula o retorno "não array" mesmo que seja compatível com Client[]
     mockClientService.getAllClients.and.returnValue(
       of(clientLikeObject as any)
     );
 
     fixture.detectChanges();
 
-    expect(component.clients.length).toBe(1); // colocado dentro de um array pelo ternário
+    expect(component.clients.length).toBe(1);
     expect(component.clients[0]).toEqual(clientLikeObject);
     expect(component.errorMessage).toBeNull();
   });

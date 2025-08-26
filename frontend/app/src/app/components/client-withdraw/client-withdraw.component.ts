@@ -37,7 +37,6 @@ export class ClientWithdrawComponent {
     }
 
     this.loading = true;
-    // Corrigido: agora passamos os três argumentos separados
     this.clientService.withdraw(this.id, this.amount, this.password).subscribe({
       next: (balance: number) => {
         this.newBalance = balance;

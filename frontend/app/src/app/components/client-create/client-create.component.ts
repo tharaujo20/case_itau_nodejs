@@ -24,7 +24,7 @@ export class ClientCreateComponent {
   constructor(private clientService: ClientService, private router: Router) {}
 
   validatePassword(): boolean {
-    return /^\d{4}$/.test(this.password); // exatamente 4 dígitos numéricos
+    return /^\d{4}$/.test(this.password);
   }
 
   createClient(): void {

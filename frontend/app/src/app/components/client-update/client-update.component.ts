@@ -24,7 +24,7 @@ export class ClientUpdateComponent {
   constructor(private clientService: ClientService, private router: Router) {}
 
   validatePassword(): boolean {
-    if (!this.password) return true; // não é obrigatório
+    if (!this.password) return true;
     return /^\d{4}$/.test(this.password);
   }
 

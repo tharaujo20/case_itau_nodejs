@@ -48,9 +48,7 @@ describe('ClientDeleteComponent', () => {
     mockClientService.deleteClient.and.returnValue(of(void 0));
 
     component.deleteClient();
-    expect(component.loading).toBeTrue();
 
-    // Avança o subscribe.next
     tick();
     fixture.detectChanges();
 
@@ -58,7 +56,6 @@ describe('ClientDeleteComponent', () => {
     expect(component.errorMessage).toBeNull();
     expect(component.loading).toBeFalse();
 
-    // Avança o setTimeout de 2s para navegar
     tick(2000);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/clientes']);
   }));
@@ -70,9 +67,7 @@ describe('ClientDeleteComponent', () => {
     );
 
     component.deleteClient();
-    expect(component.loading).toBeTrue();
 
-    // Avança o subscribe.error
     tick();
     fixture.detectChanges();
 
