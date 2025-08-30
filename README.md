@@ -45,11 +45,11 @@ Se você viu o cliente 'TESTE' sendo listado, estamos indo muito bem até aqui! 
 Execute os três comandos de exemplo abaixo, assim vamos popular nossa tabela:
 
 ```bash
-curl -X POST http://localhost:8080/clientes -H "Content-Type: application/json" -d "{\"name\":\"Primeiro Cliente\",\"email\":\"primeiro.cliente@email.com\",\"balance\":1000,\"password\":1234}"
+curl -X POST http://localhost:8080/clientes/novo -H "Content-Type: application/json" -d "{\"name\":\"Primeiro Cliente\",\"email\":\"primeiro.cliente@email.com\",\"balance\":1000,\"password\":1234}"
 
-curl -X POST http://localhost:8080/clientes -H "Content-Type: application/json" -d "{\"name\":\"Segundo Cliente\",\"email\":\"segundo.cliente@email.com\",\"balance\":2000,\"password\":5678}"
+curl -X POST http://localhost:8080/clientes/novo -H "Content-Type: application/json" -d "{\"name\":\"Segundo Cliente\",\"email\":\"segundo.cliente@email.com\",\"balance\":2000,\"password\":5678}"
 
-curl -X POST http://localhost:8080/clientes -H "Content-Type: application/json" -d "{\"name\":\"Terceiro Cliente\",\"email\":\"terceiro.cliente@email.com\",\"balance\":3300,\"password\":3098}"
+curl -X POST http://localhost:8080/clientes/novo -H "Content-Type: application/json" -d "{\"name\":\"Terceiro Cliente\",\"email\":\"terceiro.cliente@email.com\",\"balance\":3300,\"password\":3098}"
 ```
 
 Por hora, aqui é o suficiente pelo terminal, mas ainda é possível executar todas as demais funções por aqui.</br>
