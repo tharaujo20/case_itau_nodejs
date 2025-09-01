@@ -1,12 +1,13 @@
 # Arquitetura
 
 Minha ideia para este tópico foi trazer duas propostas: uma básica, outra robusta.</br>
-O intuito é mostrar que existem diversas formas de chegar a uma solução e que a decisão final deve-se pautar principalmente na estratégica a ser seguda e qual opção a equipe está disposta a lidar.
+O intuito é mostrar que existem diversas formas de chegar a uma solução e que a decisão final deve-se pautar principalmente na estratégia a ser seguida e qual opção a equipe está disposta a lidar.
 
 ## Básica
 
 **Opção menos resiliente, mais barata</br>**
-Começando com algo básico, esta opção consiste principalmente na atuação de lambdas.
+Começando com algo básico, esta opção consiste principalmente na atuação de lambdas.<br>
+![Proposta basica](case_nodejs-basica.drawio.png)
 
 - Serviço S3 de Static Website Hosting para garantir o funcionamento dos arquivos estáticos do frontend. O próprio browser do cliente se encarrega pelas requisições à api do backend.
 - API Gateway apontando para as diferentes AZs, assegurando resiliência.
@@ -25,7 +26,8 @@ Básica: barata, serverless com Lambda + Aurora, cobre o essencial de segurança
 ## Robusta
 
 **Opção mais resiliente, menos barata</br>**
-Pensando em uma evolução mais consistênte, esta opção consiste principalmente na atuação containers.
+Pensando em uma evolução mais consistênte, esta opção consiste principalmente na atuação containers.<br>
+![Proposta robusta](case_nodejs-robusta.drawio.png)
 
 - Cloudfront utilizado para gerenciar a camada de frontend, adicionando melhor tempo de resposta e performance à esta camada, estando hospedado em uma Edge Location.
 - Serviços adicionais de segurança como o WAF e o Shield, que atuam nas Edge Locations para prevenindo ataques.
@@ -41,7 +43,7 @@ Pensando em uma evolução mais consistênte, esta opção consiste principalmen
 
 **Pontos de atenção:**
 
-- Cluster ECS no lugar de EKS apenas para praticidade da proposta a ser apresentada, dado que no EKS há mais itens a serem gerenciados pelo Cliente, exigindo maior curva de aprendizado relacionada ao Kubernets. Ainda assim, também seria uma opção que se ecaixa neste contexto
+- Cluster ECS no lugar de EKS apenas para praticidade da proposta a ser apresentada, dado que no EKS há mais itens a serem gerenciados pelo Cliente, exigindo maior curva de aprendizado relacionada ao Kubernets. Ainda assim, também seria uma opção que se encaixa neste contexto
 - A proposta totalmente voltada para recursos serverless é prática e possível, porém com custo bem mais elevado, o que pode ser um ponto grave ao se considerar FinOps.
 
 **Conclusão**</br>
