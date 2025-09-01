@@ -215,6 +215,7 @@ Abaixo algumas melhorias que eu deixaria como um possível backlog.
   - Performance: adotar estratégia de cache enquanto o cliente estiver em atividade, evitando sobrecarregar a base de dados
 
 - Frontend:
+  - Privacidade e experiência: ocultar a senha para efetivação de saque.
   - Acessibilidade: adotar padrões de qualidade para entregar algo visualmente acessível.
   - Identidade: adaptar visualização para o que é esperado de uma marca.
   - Desempenho: garantir o tempo de resposta, essa experiência está diretamente relacionada à satisfação do cliente que utiliza o serviço.
