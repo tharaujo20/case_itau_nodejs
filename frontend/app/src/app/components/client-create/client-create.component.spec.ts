@@ -72,7 +72,7 @@ describe('ClientCreateComponent', () => {
       component.password = '12';
       component.createClient();
       expect(component.errorMessage).toBe(
-        'A senha deve conter exatamente 4 dígitos numéricos.'
+        'A senha deve conter exatamente 4 dígitos numéricos. | Não iniciar com 0 (zero)'
       );
       expect(component.loading).toBeFalse();
     });

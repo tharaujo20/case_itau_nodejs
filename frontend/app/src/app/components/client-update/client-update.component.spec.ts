@@ -68,7 +68,7 @@ describe('ClientUpdateComponent', () => {
       component.updateClient();
 
       expect(component.errorMessage).toBe(
-        'A senha deve conter exatamente 4 dígitos numéricos.'
+        'A senha deve conter exatamente 4 dígitos numéricos. | Não iniciar com 0 (zero)'
       );
       expect(component.loading).toBeFalse();
       expect(component.message).toBeNull();

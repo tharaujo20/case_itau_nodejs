@@ -37,7 +37,8 @@ export class ClientCreateComponent {
     }
 
     if (!this.validatePassword()) {
-      this.errorMessage = 'A senha deve conter exatamente 4 dígitos numéricos.';
+      this.errorMessage =
+        'A senha deve conter exatamente 4 dígitos numéricos. | Não iniciar com 0 (zero)';
       return;
     }
 
