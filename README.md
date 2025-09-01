@@ -146,7 +146,9 @@ Incluso um arquivo do que seria um TAAC executado na esteira em momento de impla
 npm run test:e2e
 ```
 
-### Notas
+---
+
+## Notas
 
 1. Porque o Nest.js para o Backend?
    Alguns critérios me fizeram tomar a decisão de trocar o uso de Express pelo Nest.js.
@@ -165,34 +167,54 @@ npm run test:e2e
    - Typescript:
      Aqui também considero a familiaridade que tenho usando Typescript, dado que o Nest já é nativo em .ts, isso facilita as configurações e já garante tipagem forte desde o início.
 
-2. Jest.js para testes unitários
+2. Jest.js para testes unitários</br>
    Além de já ser um recurso nativo do Nest ao criar o projeto, vejo que ele trás outras vantagens frente a outros frameworks, como o Mocka por exemplo. Ele acaba sendo mais performático na execução por conseguir executar vários cenários de forma paralela.
 
    A função do _--coverage_ é uma das que mais uso e considero um grande facilitador. Por fim, também o ponto da experiência e familiaridade. Vi o Mocka apenas em alguns repos muito antigos, a grande maioria dos projetos que vi, usavam jest.
 
-3. Resolução de problemas
+3. Resolução de problemas</br>
    A etapa do frontend foi, especialmente, desafiadora pelo fato de ser quase que um primeiro contato com o Angular. Aqui, pessoalmete, o case foi mais _como usar as ferramentas que tenho a disposição para resolver este problema?_. De forma prática e autônoma, consegui implementar meu primeiro projeto front do zero. Algo básico, porém com as funcioanlidades esperadas e tudo testado.
 
-4. O problema com a gestão do saldo
+4. O problema com a gestão do saldo</br>
    O case original apresentava um erro com o controle de saldo do cliente. O que identifiquei foi que a forma com que a tabela era criada o 'saldo' sempre ficava 'null' e, mesmo queeu tentasse inferir um novo valor, o null não se alterava.
 
    Para este caso, na nova tabela foi criado como 'not null' e 'default 0' e na etapa de criação informar o saldo é opcional. Caso informado algum valor no momento da criação de um novo cliente, este passa a ser o saldo inicial. Caso não seja, o cliente inicia com saldo 0.
 
    As operações de depósito e saque conseguem manipular este valor corretamente.
 
-5. Segurança
+5. Segurança</br>
    O case original exigia uma ação de segurança. Neste caso, por tratar-se de algo básicas e sem necessidade de expandir os limites do case, optei por adicionar a criação de uma senha para cada cliente e, ao tentar efetuar a **operação de saque**, é **obrigatório** informar a senha. O ideal é que se memorize a senha informada nos testes, pois esta informação não é exibida em nenhum lugar no front e exigida no saque.
 
    Existe ainda a função 'editar senha' pela rota de atualização, caso necessário. Mesmo assim, memorize-a durante os testes pois ela não é exibida via front.
 
-6. Estética
+6. Estética</br>
    Adicionei algumas boas práticas e usos de ferramentas que facilitam a padronização e garantem uma boa estética ao código.
 
    - ESLint, que observa a implementação prevenindo erros lógicos ou de sintaxe;
    - Prettier, que cuida do estilo, formatação e mantém uma aparência consistente;
    - Conventional commits, que mantém os comentários dos commits objetivos conforme a convenção de "contexto: descrição"
 
-7. Adicionais
+7. Adicionais</br>
    Há notas em formato de comentário em quase todos os arquivos do backend, onde informo algumas decisões e detalhes adicionais envolvendo minha implementação.
 
-8.
+## Próximos passos
+
+O case, da forma que está, considero que entrega o valor proposto. Porém, é passível de muitas evoluções.</br>
+Abaixo algumas melhorias que eu deixaria como um possível backlog.
+
+- Backend:
+
+  - Segregar o módulo atua do cliente em dois domínios:
+    - "manager": CRUD do cliente
+    - "transações": responsável pelas operações financeiras (no momento, somente depósito e saque)
+  - Validações: implementar formas de validações mais inteligentes, evitar ao máximo repetição de código e sempre que possível, priorizar o reuso
+    - Exemplo deixado intencionalmente no código: repetidas vezes consultando se o cliente existe antes de efetuar alguma ação (deleção ou saque, por exemplo)
+  - Base de dados: sugestão de adoção de um banco chave-valor para ganhar na performance e escalabilidade rápida
+  - Segurança: adotar mais medidas de segurança e fatores adicionais além da solicitação da senha implementada.
+  - Custo: decidir e padronizar os logs gerados. Dado que cada nível de log tem um custo diferente, padronizar o que deve ser logado e em qual nível, visando otimização
+  - Performance: adotar estratégia de cache enquanto o cliente estiver em atividade, evitando sobrecarregar a base de dados
+
+- Frontend:
+  - Acessibilidade: adotar padrões de qualidade para entregar algo visualmente acessível.
+  - Identidade: adaptar visualização para o que é esperado de uma marca.
+  - Desempenho: garantir o tempo de resposta, essa experiência está diretamente relacionada à satisfação do cliente que utiliza o serviço.
