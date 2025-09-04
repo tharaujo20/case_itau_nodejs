@@ -50,9 +50,11 @@
       "/dist/",
       "app.module.ts",
       "client.module.ts",
+      ".eslintrc.js",
       "main.ts",
       "/config/",
-      "/test/"
+      "/test/",
+      "/coverage/"
     ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
@@ -62,7 +64,7 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "../app/coverage",
     "testEnvironment": "node"
   }
 }
